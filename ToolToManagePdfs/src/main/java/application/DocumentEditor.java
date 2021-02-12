@@ -45,7 +45,7 @@ public class DocumentEditor {
             //extract the text
             PDFTextStripper pdfStripper = new PDFTextStripper();
             this.scannedText = pdfStripper.getText(doc);
-            System.out.println("File read");
+            System.out.println(">>>File read<<<");
             //extract the document properties
             PDDocumentInformation docInformation = doc.getDocumentInformation();
 

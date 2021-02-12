@@ -9,7 +9,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.util.Span;
@@ -20,22 +19,28 @@ import opennlp.tools.util.Span;
  */
 public class NameRecogniser {
 
-    public NameRecogniser() throws FileNotFoundException, IOException {
-        try (InputStream modelIn = new FileInputStream("C:\\Users\\tamag\\Desktop\\Ptyxiakh\\ResearchOrganiser\\KyriakosBisiklis\\toolToManagePdfs\\src\\main\\java\\resources\\en-ner-location.bin")) {
-            TokenNameFinderModel model = new TokenNameFinderModel(modelIn);
-            NameFinderME nameFinder = new NameFinderME(model);
+    public NameRecogniser(String inputText) throws FileNotFoundException, IOException {
 
-            String sentence[] = new String[]{
-                "London",
-                "Vinken",
-                "is",
-                "61",
-                "old",
-                "."
-            };
+        String[] tokens = inputText.split(" ");
 
-            Span nameSpans[] = nameFinder.find(sentence);
-            System.out.println("nameSpans: " + Arrays.toString(nameSpans));
+        String currentDirectory = System.getProperty("user.dir");
+        String locationModelPath = currentDirectory + "\\src\\main\\java\\application\\en-ner-location.bin";
+        String personModelPath = currentDirectory + "\\src\\main\\java\\application\\en-ner-person.bin";
+
+        InputStream modelIn = new FileInputStream(locationModelPath);
+        TokenNameFinderModel locationModel = new TokenNameFinderModel(modelIn);
+        modelIn = new FileInputStream(personModelPath);
+        TokenNameFinderModel personModel = new TokenNameFinderModel(modelIn);
+        NameFinderME locationFinder = new NameFinderME(locationModel);
+        NameFinderME persoFinder = new NameFinderME(personModel);
+
+        Span locationSpans[] = locationFinder.find(tokens);
+        Span personSpans[] = persoFinder.find(tokens);
+        for (Span span : locationSpans) {
+            System.out.println("Position - " + span.toString() + "    Entity - " + tokens[span.getStart()] + "    Type - " + span.getType());
+        }
+        for (Span span : personSpans) {
+            System.out.println("Position - " + span.toString() + "    Entity - " + tokens[span.getStart()] + "    Type - " + span.getType());
         }
 
     }
