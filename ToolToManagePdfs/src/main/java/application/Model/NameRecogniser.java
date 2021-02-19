@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package application;
+package application.Model;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,8 +24,8 @@ public class NameRecogniser {
         String[] tokens = inputText.split(" ");
 
         String currentDirectory = System.getProperty("user.dir");
-        String locationModelPath = currentDirectory + "\\src\\main\\java\\application\\en-ner-location.bin";
-        String personModelPath = currentDirectory + "\\src\\main\\java\\application\\en-ner-person.bin";
+        String locationModelPath = currentDirectory + "\\src\\main\\java\\resources\\en-ner-location.bin";
+        String personModelPath = currentDirectory + "\\src\\main\\java\\resources\\en-ner-person.bin";
 
         InputStream modelIn = new FileInputStream(locationModelPath);
         TokenNameFinderModel locationModel = new TokenNameFinderModel(modelIn);
