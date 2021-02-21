@@ -1,8 +1,9 @@
 package application.Controler;
 
 import application.Model.NameRecogniser;
-import application.Model.DocumentEditor;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,11 +22,24 @@ public class App {
         String relativePath = currentDirectory + "\\src\\main\\java\\resources\\";
 
         // System.out.println(editor.getScannedText());
-        while (keyboard.hasNext()) {
-            switch (keyboard.next()) {
-                case "findNames": {
-                    DocumentEditor editor = new DocumentEditor(relativePath + keyboard.next());
+        String inputLine = keyboard.nextLine();
+        String[] words = inputLine.split("\\s+");
+
+        switch (words[0]) {
+            case "findNames": {
+                List<String> filePaths = new ArrayList<String>();
+                int counter = 0;
+                for (int i = 1; i < words.length; i++) {
+                    filePaths.add(relativePath + words[i]);
+                    counter++;
+                    System.out.println("read file:" + filePaths.get(i - 1));
+                }
+
+                Manager.createEditors(counter, filePaths);
+                Manager.editors.forEach(editor -> {
+                    System.out.println(">>>In file: " + editor.getPath());
                     nameFinder(editor.getScannedText());
+                });
                 }
                 case "exit": {
                     System.out.println(">>>exiting PdfOrganiser<<<");
@@ -35,8 +49,8 @@ public class App {
                     System.out.println(">>>unrecognised command<<<");
                 }
 
-            }
         }
+
 
         return 1;
     }
@@ -46,8 +60,8 @@ public class App {
         System.out.println(">>>PdfOrganiser v0.1<<<");
         System.out.println("enter command >>");
 
-
         commandHandler();
+        System.out.println("Yoooo11");
 
     }
 
