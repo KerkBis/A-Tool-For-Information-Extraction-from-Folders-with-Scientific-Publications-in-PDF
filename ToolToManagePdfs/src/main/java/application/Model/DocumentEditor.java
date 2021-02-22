@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -35,9 +33,9 @@ public class DocumentEditor {
     private Calendar creationDate, modifiedDate;
     private String scannedText;
 
-    public DocumentEditor(String pathname) {
+    public DocumentEditor(String pathname) throws IOException {
         initialiseCommandMap();
-        try {
+
             //get the pdf file to read it
             File file = new File(pathname);
             this.doc = PDDocument.load(file);
@@ -45,7 +43,7 @@ public class DocumentEditor {
             //extract the text
             PDFTextStripper pdfStripper = new PDFTextStripper();
             this.scannedText = pdfStripper.getText(doc);
-            System.out.println(">>>File read<<<");
+            System.out.println(">>>Reading file " + this.path + "<<<");
             //extract the document properties
             PDDocumentInformation docInformation = doc.getDocumentInformation();
 
@@ -58,9 +56,6 @@ public class DocumentEditor {
             this.modifiedDate = docInformation.getModificationDate();
             this.keywords = docInformation.getKeywords();
 
-        } catch (IOException ex) {
-            Logger.getLogger(DocumentEditor.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     private void initialiseCommandMap() {

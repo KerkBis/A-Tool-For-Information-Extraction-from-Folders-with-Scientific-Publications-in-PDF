@@ -6,6 +6,7 @@
 package application.Controler;
 
 import application.Model.DocumentEditor;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +18,9 @@ public class Manager {
 
     static List<DocumentEditor> editors = new ArrayList<>();
 
-    static int createEditors(int numberOfEditors, List<String> pathNames) {
+    static int createEditors(int numberOfEditors, List<String> pathNames) throws IOException {
         for (int i = 0; i < numberOfEditors; i++) {
-            System.out.println("Making editor");
+            System.out.println(">>>Making editor<<<");
             editors.add(new DocumentEditor(pathNames.get(i)));
         }
         return 0;

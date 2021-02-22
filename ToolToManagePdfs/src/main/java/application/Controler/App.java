@@ -14,44 +14,53 @@ import java.util.logging.Logger;
  */
 public class App {
 
-    static int commandHandler() {
-
-        Scanner keyboard = new Scanner(System.in);
+    static int commandHandler(Scanner keyboard) {
 
         String currentDirectory = System.getProperty("user.dir");
         String relativePath = currentDirectory + "\\src\\main\\java\\resources\\";
 
-        // System.out.println(editor.getScannedText());
-        String inputLine = keyboard.nextLine();
-        String[] words = inputLine.split("\\s+");
+        String inputLine;
+        String[] words;
 
-        switch (words[0]) {
-            case "findNames": {
-                List<String> filePaths = new ArrayList<String>();
-                int counter = 0;
-                for (int i = 1; i < words.length; i++) {
-                    filePaths.add(relativePath + words[i]);
-                    counter++;
-                    System.out.println("read file:" + filePaths.get(i - 1));
-                }
+        while (keyboard.hasNext()) {
+            inputLine = keyboard.nextLine();
+            words = inputLine.split("\\s+");
 
-                Manager.createEditors(counter, filePaths);
-                Manager.editors.forEach(editor -> {
-                    System.out.println(">>>In file: " + editor.getPath());
-                    nameFinder(editor.getScannedText());
-                });
+            switch (words[0]) {
+                case "findNames": {
+                    List<String> filePaths = new ArrayList<String>();
+                    int counter = 0;
+                    for (int i = 1; i < words.length; i++) {
+                        filePaths.add(relativePath + words[i]);
+                        counter++;
+//                        System.out.println("read file:" + filePaths.get(i - 1));
+                    }
+
+                    try {
+                    Manager.createEditors(counter, filePaths);
+                    } catch (IOException ex) {
+                        System.out.println("File given not found please try again");
+                        break;
+                    }
+                    Manager.editors.forEach(editor -> {
+//                        System.out.println(">>>In file: " + editor.getPath());
+                        nameFinder(editor.getScannedText());
+                    });
+
+                    break;
                 }
                 case "exit": {
                     System.out.println(">>>exiting PdfOrganiser<<<");
-                    return 0;
+                    Manager.closeAllEditors();
+                    return 1;
                 }
                 default: {
                     System.out.println(">>>unrecognised command<<<");
                 }
 
+            }
+
         }
-
-
         return 1;
     }
 
@@ -60,8 +69,9 @@ public class App {
         System.out.println(">>>PdfOrganiser v0.1<<<");
         System.out.println("enter command >>");
 
-        commandHandler();
-        System.out.println("Yoooo11");
+        Scanner keyboard = new Scanner(System.in);
+
+        commandHandler(keyboard);
 
     }
 
