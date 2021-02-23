@@ -1,5 +1,6 @@
 package application.Controler;
 
+import application.Model.DocumentEditor;
 import application.Model.NameRecogniser;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -69,9 +70,17 @@ public class App {
         System.out.println(">>>PdfOrganiser v0.1<<<");
         System.out.println("enter command >>");
 
-        Scanner keyboard = new Scanner(System.in);
+        String currentDirectory = System.getProperty("user.dir");
+        String relativePath = currentDirectory + "\\src\\main\\java\\resources\\";
 
-        commandHandler(keyboard);
+        //Scanner keyboard = new Scanner(System.in);
+        try {
+            DocumentEditor dc = new DocumentEditor(relativePath + "testDoc.pdf");
+            dc.getFirtsPage();
+            //commandHandler(keyboard);
+        } catch (IOException ex) {
+            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 

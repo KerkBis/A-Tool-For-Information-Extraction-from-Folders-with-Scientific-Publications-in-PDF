@@ -36,9 +36,9 @@ public class NameRecogniser {
 
         Span locationSpans[] = locationFinder.find(tokens);
         Span personSpans[] = persoFinder.find(tokens);
-        for (Span span : locationSpans) {
-            System.out.println("Position - " + span.toString() + "    Entity - " + tokens[span.getStart()] + "    Type - " + span.getType());
-        }
+//        for (Span span : locationSpans) {
+//            System.out.println("Position - " + span.toString() + "    Entity - " + tokens[span.getStart()] + "    Type - " + span.getType());
+//        }
         for (Span span : personSpans) {
             System.out.println("Position - " + span.toString() + "    Entity - " + tokens[span.getStart()] + "    Type - " + span.getType());
         }

@@ -58,6 +58,15 @@ public class DocumentEditor {
 
     }
 
+    public void getFirtsPage() throws IOException {
+        PDDocument fd = new PDDocument();
+        fd.addPage(this.doc.getPage(0));
+        PDFTextStripper pdfStripper = new PDFTextStripper();
+        String fst = pdfStripper.getText(fd);
+        System.out.println("First page: " + fst);
+
+    }
+
     private void initialiseCommandMap() {
         commands = new HashMap<>();
         commands.put("set path", (String value) -> this.path = value);
