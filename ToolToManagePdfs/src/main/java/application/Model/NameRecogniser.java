@@ -39,8 +39,15 @@ public class NameRecogniser {
 //        for (Span span : locationSpans) {
 //            System.out.println("Position - " + span.toString() + "    Entity - " + tokens[span.getStart()] + "    Type - " + span.getType());
 //        }
+        int first3Names = 0;
+        //Usually the first 3 names of a research papers are related to the author
+
         for (Span span : personSpans) {
-            System.out.println("Position - " + span.toString() + "    Entity - " + tokens[span.getStart()] + "    Type - " + span.getType());
+            if (first3Names >= 3) {
+                break;
+            }
+            System.out.println("Position - " + span.toString() + "    Name - " + tokens[span.getStart()]);
+            first3Names++;
         }
 
     }

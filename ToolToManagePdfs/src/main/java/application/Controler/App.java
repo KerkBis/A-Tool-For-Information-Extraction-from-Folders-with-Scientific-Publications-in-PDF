@@ -1,6 +1,5 @@
 package application.Controler;
 
-import application.Model.DocumentEditor;
 import application.Model.NameRecogniser;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,16 +37,17 @@ public class App {
                     }
 
                     try {
-                    Manager.createEditors(counter, filePaths);
+                        Manager.createEditors(counter, filePaths);
                     } catch (IOException ex) {
                         System.out.println("File given not found please try again");
                         break;
                     }
                     Manager.editors.forEach(editor -> {
-//                        System.out.println(">>>In file: " + editor.getPath());
-                        nameFinder(editor.getScannedText());
+                        System.out.println(">>>Names recognised for file: " + editor.getPath() + "<<<");
+                        //nameFinder(editor.getScannedText());
+                        editor.filterTextByRegex(editor.getScannedText());
                     });
-
+                    Manager.closeAllEditors();
                     break;
                 }
                 case "exit": {
@@ -70,17 +70,16 @@ public class App {
         System.out.println(">>>PdfOrganiser v0.1<<<");
         System.out.println("enter command >>");
 
-        String currentDirectory = System.getProperty("user.dir");
-        String relativePath = currentDirectory + "\\src\\main\\java\\resources\\";
-
-        //Scanner keyboard = new Scanner(System.in);
-        try {
-            DocumentEditor dc = new DocumentEditor(relativePath + "testDoc.pdf");
-            dc.getFirtsPage();
-            //commandHandler(keyboard);
-        } catch (IOException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Scanner keyboard = new Scanner(System.in);
+        commandHandler(keyboard);
+//        String currentDirectory = System.getProperty("user.dir");
+//        String relativePath = currentDirectory + "\\src\\main\\java\\resources\\";
+//        try {
+//            DocumentEditor dc = new DocumentEditor(relativePath + "testDoc3.pdf");
+//            dc.filterTextByRegex("fgcgvjh Kerk Bob hgvbjbj John Doe hjbj.Hello");
+//        } catch (IOException ex) {
+//            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+//        }
 
     }
 

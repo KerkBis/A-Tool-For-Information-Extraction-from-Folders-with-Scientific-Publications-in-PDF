@@ -9,6 +9,8 @@ import application.Model.DocumentEditor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -27,6 +29,13 @@ public class Manager {
     }
 
     static int closeAllEditors() {
+        editors.forEach(editor -> {
+            try {
+                editor.close();
+            } catch (IOException ex) {
+                Logger.getLogger(Manager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
         editors.clear();
         return 0;
     }
