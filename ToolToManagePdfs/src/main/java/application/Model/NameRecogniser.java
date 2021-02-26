@@ -9,6 +9,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.util.Span;
@@ -19,6 +21,9 @@ import opennlp.tools.util.Span;
  */
 public class NameRecogniser {
 
+    public NameRecogniser() {
+
+    }
     public NameRecogniser(String inputText) throws FileNotFoundException, IOException {
 
         String[] tokens = inputText.split(" ");
@@ -48,6 +53,26 @@ public class NameRecogniser {
             }
             System.out.println("Position - " + span.toString() + "    Name - " + tokens[span.getStart()]);
             first3Names++;
+        }
+
+    }
+
+    public void filterTextByRegex(String text) {
+
+        //full names are Name Lastname so 2 CFL words seperated by whitespace are possibly a name.
+        //"(\\b[A-Z]{1}[a-z]+)( )([A-Z]{1}[a-z]+\\b)" this regex targets standar names inside text
+        //^([A-z\'\.-ᶜ]*(\s))+[A-z\'\.-ᶜ]*$ for names like DiMaggio St. Croix, O'Reilly butt is alone
+        Pattern p = Pattern.compile("(\\b[A-Z]{1}[a-z]+)( )([A-Z]{1}[a-z]+\\b)");
+        Matcher matcher = p.matcher(text);
+        boolean found = false;
+        while (matcher.find()) {
+
+            System.out.println("Possible name: " + matcher.group() + " Position: "
+                    + matcher.start() + "," + matcher.end());
+            found = true;
+        }
+        if (!found) {
+            System.out.println("No match found.");
         }
 
     }

@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Hello world!
@@ -44,8 +42,8 @@ public class App {
                     }
                     Manager.editors.forEach(editor -> {
                         System.out.println(">>>Names recognised for file: " + editor.getPath() + "<<<");
-                        //nameFinder(editor.getScannedText());
-                        editor.filterTextByRegex(editor.getScannedText());
+                        NameRecogniser nr = new NameRecogniser();
+                        nr.filterTextByRegex(editor.getScannedText());
                     });
                     Manager.closeAllEditors();
                     break;
@@ -83,13 +81,4 @@ public class App {
 
     }
 
-    static private int nameFinder(String text) {
-        try {
-            NameRecogniser nr = new NameRecogniser(text);
-        } catch (IOException ex) {
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
-            return 0;
-        }
-        return 1;
-    }
 }

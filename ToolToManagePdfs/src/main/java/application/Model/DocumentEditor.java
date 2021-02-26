@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -79,26 +77,6 @@ public class DocumentEditor {
         this.doc.close();
     }
 
-    public void filterTextByRegex(String text) {
-        String filteredText;
-        //full names are Name Lastname so 2 CFL words seperated by whitespace are possibly a name.
-        //"(\\b[A-Z]{1}[a-z]+)( )([A-Z]{1}[a-z]+\\b)" this regex targets standar names inside text
-        //^([A-z\'\.-ᶜ]*(\s))+[A-z\'\.-ᶜ]*$ for names like DiMaggio St. Croix, O'Reilly butt is alone
-        Pattern p = Pattern.compile("(\\b[A-Z]{1}[a-z]+)( )([A-Z]{1}[a-z]+\\b)");
-        Matcher matcher = p.matcher(text);
-        boolean found = false;
-        while (matcher.find()) {
-
-            System.out.println("Possible name: " + matcher.group() + " Position: "
-                    + matcher.start() + "," + matcher.end());
-            found = true;
-        }
-        if (!found) {
-            System.out.println("No match found.");
-        }
-
-        //return filteredText;
-    }
 
     private void initialiseCommandMap() {
         commands = new HashMap<>();
