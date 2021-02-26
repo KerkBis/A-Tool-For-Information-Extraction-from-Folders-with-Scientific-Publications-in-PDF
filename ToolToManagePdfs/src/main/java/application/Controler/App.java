@@ -1,6 +1,7 @@
 package application.Controler;
 
 import application.Model.NameRecogniser;
+import application.View.GUI;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,8 +69,11 @@ public class App {
         System.out.println(">>>PdfOrganiser v0.1<<<");
         System.out.println("enter command >>");
 
-        Scanner keyboard = new Scanner(System.in);
-        commandHandler(keyboard);
+        GUI g = new GUI();
+        g.run();
+
+//        Scanner keyboard = new Scanner(System.in);
+//        commandHandler(keyboard);
 //        String currentDirectory = System.getProperty("user.dir");
 //        String relativePath = currentDirectory + "\\src\\main\\java\\resources\\";
 //        try {
