@@ -69,9 +69,7 @@ public class App {
         System.out.println(">>>PdfOrganiser v0.1<<<");
         System.out.println("enter command >>");
 
-        GUI g = new GUI();
-        g.run();
-
+        GUI.createAndShowGUI();
 //        Scanner keyboard = new Scanner(System.in);
 //        commandHandler(keyboard);
 //        String currentDirectory = System.getProperty("user.dir");

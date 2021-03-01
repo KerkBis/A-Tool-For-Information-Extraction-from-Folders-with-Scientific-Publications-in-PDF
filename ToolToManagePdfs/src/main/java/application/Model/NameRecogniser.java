@@ -57,8 +57,8 @@ public class NameRecogniser {
 
     }
 
-    public void filterTextByRegex(String text) {
-
+    public String filterTextByRegex(String text) {
+        String output = new String();
         //full names are Name Lastname so 2 CFL words seperated by whitespace are possibly a name.
         //"(\\b[A-Z]{1}[a-z]+)( )([A-Z]{1}[a-z]+\\b)" this regex targets standar names inside text
         //^([A-z\'\.-ᶜ]*(\s))+[A-z\'\.-ᶜ]*$ for names like DiMaggio St. Croix, O'Reilly butt is alone
@@ -67,14 +67,15 @@ public class NameRecogniser {
         boolean found = false;
         while (matcher.find()) {
 
-            System.out.println("Possible name: " + matcher.group() + " Position: "
-                    + matcher.start() + "," + matcher.end());
+            output = output + "Possible name: " + matcher.group() + " Position: "
+                    + matcher.start() + "," + matcher.end() + "\n";
             found = true;
         }
         if (!found) {
             System.out.println("No match found.");
         }
 
+        return output;
     }
 
 }

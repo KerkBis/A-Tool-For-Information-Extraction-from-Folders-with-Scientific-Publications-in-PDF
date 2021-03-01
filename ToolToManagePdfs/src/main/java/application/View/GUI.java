@@ -5,58 +5,116 @@
  */
 package application.View;
 
+import application.Model.DocumentEditor;
+import application.Model.NameRecogniser;
 import java.awt.BorderLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 /**
  *
  * @author tamag
  */
-public class GUI {
-    private JLabel statusLabel;
-    public void run() {
-        //Creating the Frame
-        JFrame frame = new JFrame("Chat Frame");
+public class GUI extends JPanel
+        implements ActionListener {
+
+    static private final String newline = "\n";
+    JButton openButton, saveButton;
+    JTextArea log;
+    JFileChooser fc;
+
+
+    public GUI() {
+        super(new BorderLayout());
+        //Create the log first, because the action listeners
+        //need to refer to it.
+        log = new JTextArea(20, 30);
+        log.setMargin(new Insets(5, 5, 5, 5));
+        log.setEditable(false);
+        JScrollPane logScrollPane = new JScrollPane(log);
+
+        //Create file choosr
+        fc = new JFileChooser();
+
+        //dfferent modes
+        //fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        //fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        //Create the open button
+        openButton = new JButton("Open a File...");
+        openButton.addActionListener(this);
+
+        //Create the save button
+        saveButton = new JButton("Save a File...");
+        saveButton.addActionListener(this);
+
+        //For layout purposes, put the buttons in a separate panel
+        JPanel buttonPanel = new JPanel(); //use FlowLayout
+        buttonPanel.add(openButton);
+        buttonPanel.add(saveButton);
+
+        //Add the buttons and the log to this panel.
+        add(buttonPanel, BorderLayout.PAGE_START);
+        add(logScrollPane, BorderLayout.CENTER);
+
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        //Handle open button action.
+        if (e.getSource() == openButton) {
+            int returnVal = fc.showOpenDialog(GUI.this);
+
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                //This is where a real application would open the file.
+                log.append("Opening: " + file.getName() + "." + newline);
+                DocumentEditor editor;
+                try {
+                    editor = new DocumentEditor(file.getPath());
+                    NameRecogniser nr = new NameRecogniser();
+                    log.append(nr.filterTextByRegex(editor.getScannedText()));
+                } catch (IOException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+            } else {
+                log.append("Open command cancelled by user." + newline);
+            }
+            log.setCaretPosition(log.getDocument().getLength());
+        } else if (saveButton == e.getSource()) {
+            int returnVal = fc.showOpenDialog(GUI.this);
+
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fc.getSelectedFile();
+                //This is where a real application would open the file.
+                log.append("Saving: " + file.getName() + "." + newline);
+            } else {
+                log.append("Save command cancelled by user." + newline);
+            }
+        }
+    }
+
+    public static void createAndShowGUI() {
+        //Create and set up the window.
+        JFrame frame = new JFrame("FileChooserDemo");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 400);
-        statusLabel = new JLabel("", JLabel.CENTER);
-        statusLabel.setSize(350, 100);
-        frame.add(statusLabel);
 
-        //Creating the MenuBar and adding components
-        JMenuBar mb = new JMenuBar();
-        JMenu m1 = new JMenu("FILE");
-        JMenu m2 = new JMenu("Help");
-        mb.add(m1);
-        mb.add(m2);
-        JMenuItem m11 = new JMenuItem("Open");
-        JMenuItem m22 = new JMenuItem("Save as");
-        m1.add(m11);
-        m1.add(m22);
+        //Add content to the window.
+        frame.add(new GUI());
 
-        //Creating the panel at bottom and adding components
-        JPanel panel = new JPanel(); // the panel is not visible in output
-        JLabel label = new JLabel("Enter command");
-        JTextField commandField = new JTextField(10); // accepts upto 10 characters
-        commandField.addActionListener((ActionEvent e) -> {
-            statusLabel.setText("You typed: " + commandField.getText());
-        });
-        JButton run = new JButton("Run");
-        panel.add(label); // Components Added using Flow Layout
-        panel.add(commandField);
-        panel.add(run);
-
-        //Adding Components to the frame.
-        frame.getContentPane().add(BorderLayout.SOUTH, panel);
-        frame.getContentPane().add(BorderLayout.NORTH, mb);
+        //Display the window.
+        frame.pack();
         frame.setVisible(true);
     }
 
