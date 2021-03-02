@@ -1,11 +1,17 @@
 package application.Controler;
 
+import application.Model.DocumentEditor;
 import application.Model.NameRecogniser;
-import application.View.GUI;
+import application.View.Graphics;
+import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 
 /**
  * Hello world!
@@ -69,7 +75,10 @@ public class App {
         System.out.println(">>>PdfOrganiser v0.1<<<");
         System.out.println("enter command >>");
 
-        GUI.createAndShowGUI();
+        GUI s = new GUI();
+        s.createAndShowGUI();
+
+
 //        Scanner keyboard = new Scanner(System.in);
 //        commandHandler(keyboard);
 //        String currentDirectory = System.getProperty("user.dir");
@@ -81,6 +90,46 @@ public class App {
 //            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 
+    }
+
+    static class GUI extends Graphics {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // Handle open button action.
+            if (e.getSource() == openButton) {
+                int returnVal = fc.showOpenDialog(GUI.this);
+
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    //This is where a real application would open the file.
+                    log.append("Opening: " + file.getName() + "." + newline);
+                    DocumentEditor editor;
+                    try {
+                        editor = new DocumentEditor(file.getPath());
+                        NameRecogniser nr = new NameRecogniser();
+                        log.append(nr.filterTextByRegex(editor.getScannedText()));
+                    } catch (IOException ex) {
+                        Logger.getLogger(Graphics.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                } else {
+                    log.append("Open command cancelled by user." + newline);
+                }
+                log.setCaretPosition(log.getDocument().getLength());
+            } else if (saveButton == e.getSource()) {
+                int returnVal = fc.showOpenDialog(GUI.this);
+
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    //This is where a real application would open the file.
+                    log.append("Saving: " + file.getName() + "." + newline);
+                } else {
+                    log.append("Save command cancelled by user." + newline);
+                }
+            }//
+
+        }
     }
 
 }
