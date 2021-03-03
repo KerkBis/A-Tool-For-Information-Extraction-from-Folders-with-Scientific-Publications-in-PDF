@@ -42,6 +42,8 @@ public abstract class Graphics extends JPanel
         //Create file choosr
         fc = new JFileChooser();
         //dfferent modes
+        fc.setMultiSelectionEnabled(true);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         //fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         //fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     }

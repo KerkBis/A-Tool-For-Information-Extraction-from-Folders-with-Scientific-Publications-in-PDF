@@ -33,13 +33,12 @@ public class DocumentEditor {
     private Calendar creationDate, modifiedDate;
     private String scannedText;
 
-    public DocumentEditor(String pathname) throws IOException {
+    public DocumentEditor(File file) throws IOException {
         initialiseCommandMap();
 
         //get the pdf file to read it
-        File file = new File(pathname);
         this.doc = PDDocument.load(file);
-        this.path = pathname;
+        this.path = file.getPath();
         //extract the text
 //    >>>Currently we dont need the whole text but only the first page<<<
 //      PDFTextStripper pdfStripper = new PDFTextStripper();
