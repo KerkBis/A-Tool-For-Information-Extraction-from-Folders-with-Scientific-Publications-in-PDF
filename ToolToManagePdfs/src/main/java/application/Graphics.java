@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package application.View;
+package application;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
@@ -22,8 +22,7 @@ import javax.swing.JTextArea;
 public abstract class Graphics extends JPanel
         implements ActionListener {
 
-    public static final String newline = "\n";
-    public JButton openButton, saveButton;
+    public JButton openButton /*, saveButton*/;
     public JTextArea log;
     public JFileChooser fc;
     JScrollPane logScrollPane;
@@ -54,15 +53,15 @@ public abstract class Graphics extends JPanel
         openButton.addActionListener(this);
 
         //Create the save button
-        saveButton = new JButton("Save a File...");
-        saveButton.addActionListener(this);
+//        saveButton = new JButton("Save a File...");
+//        saveButton.addActionListener(this);
     }
 
     public void initButtonPanel() {
         //For layout purposes, put the buttons in a separate panel
         buttonPanel = new JPanel(); //use FlowLayout
         buttonPanel.add(openButton);
-        buttonPanel.add(saveButton);
+//        buttonPanel.add(saveButton);
     }
 
     public Graphics() {

@@ -3,9 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package application.Controler;
+package application;
 
-import application.Model.DocumentEditor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,10 +21,13 @@ public class Manager {
     static List<DocumentEditor> editors = new ArrayList<>();
 
     static int createEditors(File[] files) throws IOException {
+
         for (File itterator : files) {
             System.out.println(">>>Making editor for file:" + itterator.getName() + "<<<");
             editors.add(new DocumentEditor(itterator));
+
         }
+
         return 0;
     }
 

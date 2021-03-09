@@ -3,13 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package application.Model;
+package application;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -33,18 +35,26 @@ public class DocumentEditor {
     private Calendar creationDate, modifiedDate;
     private String scannedText;
 
-    public DocumentEditor(File file) throws IOException {
+    public DocumentEditor(File file) {
+
         initialiseCommandMap();
 
         //get the pdf file to read it
-        this.doc = PDDocument.load(file);
+        try {
+            this.doc = PDDocument.load(file);
+        } catch (IOException ex) {
+            Logger.getLogger(DocumentEditor.class.getName()).log(Level.SEVERE, null, ex);
+        }
         this.path = file.getPath();
-        //extract the text
+        try {
+            //extract the text
 //    >>>Currently we dont need the whole text but only the first page<<<
 //      PDFTextStripper pdfStripper = new PDFTextStripper();
 //      this.scannedText = pdfStripper.getText(doc);
-        this.scannedText = getFirstPageText();
-
+            this.scannedText = getFirstPageText();
+        } catch (IOException ex) {
+            Logger.getLogger(DocumentEditor.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         //extract the document properties
         PDDocumentInformation docInformation = doc.getDocumentInformation();
@@ -58,7 +68,6 @@ public class DocumentEditor {
         this.modifiedDate = docInformation.getModificationDate();
         this.keywords = docInformation.getKeywords();
         System.out.println(">>>Read file " + this.path + "<<<");
-
     }
 
     private String getFirstPageText() throws IOException {
@@ -75,7 +84,6 @@ public class DocumentEditor {
     public void close() throws IOException {
         this.doc.close();
     }
-
 
     private void initialiseCommandMap() {
         commands = new HashMap<>();
