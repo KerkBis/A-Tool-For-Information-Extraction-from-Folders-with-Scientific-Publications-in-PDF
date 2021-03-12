@@ -5,10 +5,15 @@
  */
 package application;
 
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import opennlp.tools.namefind.NameFinderME;
+import opennlp.tools.namefind.TokenNameFinderModel;
+import opennlp.tools.util.Span;
 
 /**
  *
@@ -16,55 +21,59 @@ import java.util.regex.Pattern;
  */
 public class NameRecogniser {
 
+    private String text;
     public NameRecogniser() {
 
     }
-    public NameRecogniser(String inputText) throws FileNotFoundException, IOException {
 
-//        String[] tokens = inputText.split(" ");
-//
-//        String currentDirectory = System.getProperty("user.dir");
-//        String locationModelPath = currentDirectory + "\\src\\main\\java\\resources\\en-ner-location.bin";
-//        String personModelPath = currentDirectory + "\\src\\main\\java\\resources\\en-ner-person.bin";
-//
-//        InputStream modelIn = new FileInputStream(locationModelPath);
-//        TokenNameFinderModel locationModel = new TokenNameFinderModel(modelIn);
-//        modelIn = new FileInputStream(personModelPath);
-//        TokenNameFinderModel personModel = new TokenNameFinderModel(modelIn);
-//        NameFinderME locationFinder = new NameFinderME(locationModel);
-//        NameFinderME persoFinder = new NameFinderME(personModel);
-//
-//        Span locationSpans[] = locationFinder.find(tokens);
-//        Span personSpans[] = persoFinder.find(tokens);
-//        for (Span span : locationSpans) {
-//            System.out.println("Position - " + span.toString() + "    Entity - " + tokens[span.getStart()] + "    Type - " + span.getType());
-//        }
-//        int first3Names = 0;
-//        //Usually the first 3 names of a research papers are related to the author
-//
-//        for (Span span : personSpans) {
-//            if (first3Names >= 3) {
-//                break;
-//            }
-//            System.out.println("Position - " + span.toString() + "    Name - " + tokens[span.getStart()]);
-//            first3Names++;
-//        }
-
+    public NameRecogniser(String inputText) {
+        this.text = inputText;
     }
 
-    public String filterTextByRegex(String text) {
+    public ArrayList<String> findNames() throws IOException {
+        return filterTextByRegex();
+    }
+
+    public String filterTextByNER(ArrayList<String> text) throws IOException {
+
+        String[] tokens = text.toArray(new String[text.size()]);
         String output = new String();
+        String currentDirectory = System.getProperty("user.dir");
+        String personModelPath = currentDirectory + "\\src\\main\\java\\resources\\en-ner-person.bin";
+
+        InputStream modelIn = new FileInputStream(personModelPath);
+        TokenNameFinderModel personModel = new TokenNameFinderModel(modelIn);
+        NameFinderME persoFinder = new NameFinderME(personModel);
+
+        //Usually the first 3 names of a research papers are related to the author
+        Span personSpans[] = persoFinder.find(tokens);
+        int first3Names = 0;
+        for (Span span : personSpans) {
+            if (first3Names >= 3) {
+                break;
+            }
+            output = output + "Position - " + span.toString() + "    Name - " + tokens[span.getStart()] + "\n";
+            first3Names++;
+        }
+
+        return output;
+    }
+
+    public ArrayList<String> filterTextByRegex() {
+
+        ArrayList<String> output = new ArrayList();
         //full names are Name Lastname so 2 CFL words seperated by whitespace are possibly a name.
         //"(\\b[A-Z]{1}[a-z]+)( )([A-Z]{1}[a-z]+\\b)" this regex targets standar names inside text
         //^([A-z\'\.-ᶜ]*(\s))+[A-z\'\.-ᶜ]*$ for names like DiMaggio St. Croix, O'Reilly butt is alone
         Pattern p = Pattern.compile("(\\b[A-Z]{1}[a-z]+)( )([A-Z]{1}[a-z]+\\b)");
-        Matcher matcher = p.matcher(text);
+        Matcher matcher = p.matcher(this.text);
         boolean found = false;
-        while (matcher.find()) {
 
-            output = output + "Possible name: " + matcher.group() + "\n";
+        while (matcher.find()) {
+            output.add(matcher.group());
             found = true;
         }
+
         if (!found) {
             System.out.println("No match found.");
         }

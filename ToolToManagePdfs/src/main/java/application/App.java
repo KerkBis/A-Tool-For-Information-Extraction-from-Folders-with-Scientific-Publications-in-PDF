@@ -4,8 +4,6 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 
 /**
@@ -56,25 +54,23 @@ public class App {
     static StringBuffer fileProccesing(File[] files) {
 
         StringBuffer output = new StringBuffer();
-
         try {
-
             Manager.createEditors(files);
-
+            Manager.editors.forEach(editor -> {
+                output.append(">>>In file: " + editor.getPath() + "<<<\n");
+                NameRecogniser nr = new NameRecogniser(editor.getScannedText());
+                try {
+                    output.append(nr.findNames().toString());
+                    Result.exportToCSV(nr.findNames());
+                } catch (IOException ex) {
+                    output.append("AI model failed to load");
+                }
+            });
         } catch (IOException ex) {
-
-            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
+            output.append("File not found");
         }
 
-        Manager.editors.forEach(editor -> {
-
-            output.append(">>>In file: " + editor.getPath() + "<<<\n");
-            NameRecogniser nr = new NameRecogniser();
-            output.append(nr.filterTextByRegex(editor.getScannedText()));
-        });
-
         Manager.closeAllEditors();
-
         return output;
     }
 
@@ -90,9 +86,7 @@ public class App {
                     File[] files = fc.getSelectedFiles();
 
                     //This is where application begins proccesing the files.
-
                     log.append(fileProccesing(files).toString());
-
 
                 } else {
                     log.append("Open command cancelled by user.\n");

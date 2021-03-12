@@ -25,7 +25,6 @@ public class DocumentEditor {
     interface commandInterface {
 
         void apply(String x);
-
     }
 
     private Map<String, commandInterface> commands;
