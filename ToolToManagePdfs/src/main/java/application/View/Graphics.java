@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package application;
+package application.View;
 
 import java.awt.BorderLayout;
 import java.awt.Insets;
@@ -22,7 +22,7 @@ import javax.swing.JTextArea;
 public abstract class Graphics extends JPanel
         implements ActionListener {
 
-    public JButton openButton /*, saveButton*/;
+    public JButton openButton, saveButton;
     public JTextArea log;
     public JFileChooser fc;
     JScrollPane logScrollPane;
@@ -33,7 +33,7 @@ public abstract class Graphics extends JPanel
         //need to refer to it.
         log = new JTextArea(20, 30);
         log.setMargin(new Insets(5, 5, 5, 5));
-        log.setEditable(false);
+        log.setEditable(true);
         logScrollPane = new JScrollPane(log);
     }
 
@@ -52,16 +52,16 @@ public abstract class Graphics extends JPanel
         openButton = new JButton("Open a File...");
         openButton.addActionListener(this);
 
-        //Create the save button
-//        saveButton = new JButton("Save a File...");
-//        saveButton.addActionListener(this);
+//        Create the save button
+        saveButton = new JButton("Save file...");
+        saveButton.addActionListener(this);
     }
 
     public void initButtonPanel() {
         //For layout purposes, put the buttons in a separate panel
         buttonPanel = new JPanel(); //use FlowLayout
         buttonPanel.add(openButton);
-//        buttonPanel.add(saveButton);
+        buttonPanel.add(saveButton);
     }
 
     public Graphics() {
@@ -70,9 +70,6 @@ public abstract class Graphics extends JPanel
         //Add the buttons and the log to this panel.
     }
 
-//    public void actionPerformed(ActionEvent e) {
-//
-//    }
 
     public void createAndShowGUI() {
         //Create and set up the window.

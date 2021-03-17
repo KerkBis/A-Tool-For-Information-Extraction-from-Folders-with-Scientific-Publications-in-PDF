@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package application;
+package application.Controller;
 
+import application.Model.DocumentEditor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

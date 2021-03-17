@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package application;
+package application.Model;
 
 import com.opencsv.CSVWriter;
 import java.io.File;
@@ -29,15 +29,19 @@ public class Result {
             CSVWriter writer = new CSVWriter(outputfile);
 
             // adding header to csv 
-            String[] header = {"Name"};
+            String[] header = {"First Name", "Last Name"};
             writer.writeNext(header);
 
-            // add data to csv 
-//            String[] tokens = input.toArray(new String[input.size()]);
-//            for(String[] itterator:input){
-//                writer.writeNext(tokens[0] );
-//            }
-            writer.writeNext(input.toArray(new String[input.size()]));
+
+            // add data to csv
+            //turn Array list to String[]
+            String[] tokens = input.toArray(new String[input.size()]);
+            for (String itterator : tokens) {
+                //tokens elements are of form: token[i] = "Firstname Lastname"
+                //so we need to break them apart
+                writer.writeNext(itterator.split(" "));
+            }
+            // writer.writeNext(input.toArray(new String[input.size()]));
 
             System.out.println("Exported to directory: " + file.getPath());
             // closing writer connection 

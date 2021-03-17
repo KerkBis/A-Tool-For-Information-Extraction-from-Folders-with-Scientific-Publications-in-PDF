@@ -82,7 +82,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        application.App
+                                        application.Controller.App
                                     </mainClass>
                                 </manifest>
                             </archive>
