@@ -22,12 +22,14 @@ import opennlp.tools.util.Span;
 public class NameRecogniser {
 
     private String text;
+    private String path;
     public NameRecogniser() {
 
     }
 
-    public NameRecogniser(String inputText) {
+    public NameRecogniser(String filePath, String inputText) {
         this.text = inputText;
+        this.path = filePath;
     }
 
     public ArrayList<String> findNames() throws IOException {
@@ -69,6 +71,7 @@ public class NameRecogniser {
         Matcher matcher = p.matcher(this.text);
         boolean found = false;
 
+        output.add(path);
         while (matcher.find()) {
             output.add(matcher.group());
             found = true;

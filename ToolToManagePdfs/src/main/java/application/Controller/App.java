@@ -4,10 +4,8 @@ import application.Model.NameRecogniser;
 import application.Model.Result;
 import application.View.Graphics;
 import java.awt.event.ActionEvent;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
@@ -65,9 +63,9 @@ public class App {
             Manager.createEditors(files);
             Manager.editors.forEach(editor -> {
                 output.append(">>>In file: " + editor.getPath() + "<<<\n");
-                NameRecogniser nr = new NameRecogniser(editor.getScannedText());
+                NameRecogniser nr = new NameRecogniser(editor.getPath(), editor.getScannedText());
                 try {
-                    Result.exportToCSV(nr.findNames());
+                    output.append(Result.exportToCSV(nr.findNames()));
                 } catch (IOException ex) {
                     output.append("AI model failed to load");
                 }
@@ -92,28 +90,30 @@ public class App {
                     File[] files = fc.getSelectedFiles();
 
                     //This is where application begins proccesing the files.
-                    log.append(fileProccesing(files).toString());
+                    String result = fileProccesing(files).toString();
+
+                    log.append(result);
 
                     try {
-                        // String
-                        String s1 = "", sl = "";
-
-                        // File reader
-                        FileReader fr = new FileReader(System.getProperty("user.dir") + "csv");
-
-                        // Buffered reader
-                        BufferedReader br = new BufferedReader(fr);
-
-                        // Initilize sl
-                        sl = br.readLine();
-
-                        // Take the input from the file
-                        while ((s1 = br.readLine()) != null) {
-                            sl = sl + "\n" + s1;
-                        }
+//                        // String
+//                        String s1 = "", sl = "";
+//
+//                        // File reader
+//                        FileReader fr = new FileReader(System.getProperty("user.dir") + "csv");
+//
+//                        // Buffered reader
+//                        BufferedReader br = new BufferedReader(fr);
+//
+//                        // Initilize sl
+//                        sl = br.readLine();
+//
+//                        // Take the input from the file
+//                        while ((s1 = br.readLine()) != null) {
+//                            sl = sl + "\n" + s1;
+//                        }
 
                         // Set the text
-                        log.setText(sl);
+                        log.setText(result);
                     } catch (Exception evt) {
                         log.append("failed to open csv file for editing");
                     }
@@ -165,6 +165,7 @@ public class App {
 ////
         GUI s = new GUI();
         s.createAndShowGUI();
+
 //
 //        editor e = new editor();
 
@@ -174,14 +175,15 @@ public class App {
 //        frame.setVisible(true);
 //        Scanner keyboard = new Scanner(System.in);
 //        commandHandler(keyboard);
+
 //        String currentDirectory = System.getProperty("user.dir");
 //        String relativePath = currentDirectory + "\\src\\main\\java\\resources\\";
-//        try {
-//            DocumentEditor dc = new DocumentEditor(relativePath + "testDoc3.pdf");
-//            dc.filterTextByRegex("fgcgvjh Kerk Bob hgvbjbj John Doe hjbj.Hello");
-//        } catch (IOException ex) {
-//            Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+//        File f = new File(relativePath + "testDoc2.pdf");
+//        DocumentEditor dc = new DocumentEditor(f);
+//        NameRecogniser nm = new NameRecogniser(dc.getPath(), dc.getScannedText());
+//        ArrayList<String> filterTextByRegex = nm.filterTextByRegex();
+//        String exportToCSV = Result.exportToCSV(filterTextByRegex);
+//        System.out.println("the ouput: \n" + exportToCSV);
     }
 
 }
