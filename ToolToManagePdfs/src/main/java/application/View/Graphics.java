@@ -31,9 +31,9 @@ public abstract class Graphics extends JPanel
     public void initLog() {
         //Create the log first, because the action listeners
         //need to refer to it.
-        log = new JTextArea(20, 30);
+        log = new JTextArea(20, 40);
         log.setMargin(new Insets(5, 5, 5, 5));
-        log.setEditable(true);
+        log.setEditable(false);
         logScrollPane = new JScrollPane(log);
     }
 

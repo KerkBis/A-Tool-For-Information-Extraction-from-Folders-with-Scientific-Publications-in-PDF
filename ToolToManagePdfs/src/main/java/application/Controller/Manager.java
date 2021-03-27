@@ -6,6 +6,8 @@
 package application.Controller;
 
 import application.Model.DocumentEditor;
+import application.Model.NameRecogniser;
+import application.Model.Result;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,16 +22,55 @@ import java.util.logging.Logger;
 public class Manager {
 
     static List<DocumentEditor> editors = new ArrayList<>();
+    static List<NameRecogniser> nameRecognisers = new ArrayList<>();
+    static List<Result> results = new ArrayList<Result>();
 
-    static int createEditors(File[] files) throws IOException {
+    static int proccessing(File[] files) throws IOException {
+        int i = 0;
+        for (File file : files) {
+            System.out.println(">>>Making editor for file:" + file.getName() + "<<<");
+            editors.add(new DocumentEditor(file));
+            //for every editor create a NameRecogniser to analyse it's scanned text
+            String scannedText = editors.get(i).getScannedText();
+            nameRecognisers.add(new NameRecogniser(scannedText));
+            //for every NameRecogniser create a Result
+            String fileName = editors.get(i).getFileName();
+            ArrayList<String> names = nameRecognisers.get(i).findNames();
+            results.add(new Result(fileName, names));
 
-        for (File itterator : files) {
-            System.out.println(">>>Making editor for file:" + itterator.getName() + "<<<");
-            editors.add(new DocumentEditor(itterator));
-
+            i++;
         }
-
         return 0;
+    }
+
+    static String printResults() {
+        String output = new String();
+        for (Result result : results) {
+//            output = output + "For file: " + result.getFileName() + " Names found: " + result.getNames() + "\n";
+            output = output + "For file: " + result.getFileName() + " Names found: " + result.getNames() + "\n";
+        }
+        return output;
+    }
+
+    static String printText() {
+        String output = new String();
+        for (DocumentEditor editor : editors) {
+            output = output + "For file: " + editor.getFileName() + " Scanned text: " + editor.getScannedText() + "\n";
+        }
+        return output;
+    }
+
+    static String printName() {
+        String output = new String();
+        for (DocumentEditor editor : editors) {
+            output = output + "For file: " + editor.getFileName() + " Authors are: " + editor.getAuthor() + "\n";
+        }
+        return output;
+    }
+
+
+    static List<Result> getResults() {
+        return results;
     }
 
     static int closeAllEditors() {

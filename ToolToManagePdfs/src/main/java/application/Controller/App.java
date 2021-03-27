@@ -1,7 +1,5 @@
 package application.Controller;
 
-import application.Model.NameRecogniser;
-import application.Model.Result;
 import application.View.Graphics;
 import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
@@ -60,16 +58,9 @@ public class App {
 
         StringBuffer output = new StringBuffer();
         try {
-            Manager.createEditors(files);
-            Manager.editors.forEach(editor -> {
-                output.append(">>>In file: " + editor.getPath() + "<<<\n");
-                NameRecogniser nr = new NameRecogniser(editor.getPath(), editor.getScannedText());
-                try {
-                    output.append(Result.exportToCSV(nr.findNames()));
-                } catch (IOException ex) {
-                    output.append("AI model failed to load");
-                }
-            });
+            Manager.proccessing(files);
+            output.append(Manager.printResults());
+//            output.append(Manager.printName());
         } catch (IOException ex) {
             output.append("File not found");
         }
@@ -182,7 +173,7 @@ public class App {
 //        DocumentEditor dc = new DocumentEditor(f);
 //        NameRecogniser nm = new NameRecogniser(dc.getPath(), dc.getScannedText());
 //        ArrayList<String> filterTextByRegex = nm.filterTextByRegex();
-//        String exportToCSV = Result.exportToCSV(filterTextByRegex);
+//        String exportToCSV = Export.exportToCSV(filterTextByRegex);
 //        System.out.println("the ouput: \n" + exportToCSV);
     }
 

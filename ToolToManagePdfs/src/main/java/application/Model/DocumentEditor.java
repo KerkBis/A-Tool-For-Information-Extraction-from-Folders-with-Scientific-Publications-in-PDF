@@ -30,7 +30,7 @@ public class DocumentEditor {
     private Map<String, commandInterface> commands;
 
     private PDDocument doc;
-    private String path, name, author, creator, title, subject, keywords;
+    private String path, fileName, author, creator, title, subject, keywords;
     private Calendar creationDate, modifiedDate;
     private String scannedText;
 
@@ -45,6 +45,7 @@ public class DocumentEditor {
             Logger.getLogger(DocumentEditor.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.path = file.getPath();
+        this.fileName = file.getName();
         try {
             //extract the text
 //    >>>Currently we dont need the whole text but only the first page<<<
@@ -58,7 +59,6 @@ public class DocumentEditor {
         //extract the document properties
         PDDocumentInformation docInformation = doc.getDocumentInformation();
 
-        this.name = null;
         this.author = docInformation.getAuthor();
         this.title = docInformation.getTitle();
         this.creator = docInformation.getCreator();
@@ -87,7 +87,7 @@ public class DocumentEditor {
     private void initialiseCommandMap() {
         commands = new HashMap<>();
         commands.put("set path", (String value) -> this.path = value);
-        commands.put("set name", (String value) -> setName(value));
+        commands.put("set name", (String value) -> setFileName(value));
         commands.put("set author", (String value) -> setAuthor(value));
         commands.put("set creator", (String value) -> setCreator(value));
         commands.put("set title", (String value) -> setTitle(value));
@@ -95,7 +95,7 @@ public class DocumentEditor {
         commands.put("set keywords", (String value) -> setKeywords(value));
         commands.put("set scanned text", (String value) -> setScannedText(value));
 //        commands.put("get path", (String x) -> getPath());
-//        commands.put("get name", (String x) -> getName());
+//        commands.put("get fileName", (String x) -> getName());
 //        commands.put("get author", (String x) -> getAuthor());
 //        commands.put("get creator", (String x) -> getCreator());
 //        commands.put("get title", (String x) -> getTitle());
@@ -116,12 +116,12 @@ public class DocumentEditor {
         this.path = path;
     }
 
-    public String getName() {
-        return name;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getAuthor() {

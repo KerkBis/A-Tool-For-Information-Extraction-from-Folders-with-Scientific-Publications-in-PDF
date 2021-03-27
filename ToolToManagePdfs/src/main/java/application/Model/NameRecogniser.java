@@ -5,15 +5,12 @@
  */
 package application.Model;
 
-import java.io.FileInputStream;
+import edu.stanford.nlp.simple.*;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import opennlp.tools.namefind.NameFinderME;
-import opennlp.tools.namefind.TokenNameFinderModel;
-import opennlp.tools.util.Span;
 
 /**
  *
@@ -22,40 +19,47 @@ import opennlp.tools.util.Span;
 public class NameRecogniser {
 
     private String text;
-    private String path;
+    private String fileName;
+
     public NameRecogniser() {
 
     }
 
-    public NameRecogniser(String filePath, String inputText) {
+    public NameRecogniser(String inputText) {
         this.text = inputText;
-        this.path = filePath;
+
     }
 
     public ArrayList<String> findNames() throws IOException {
-        return filterTextByRegex();
+        //return filterTextByRegex();
+        //return filterTextByNER();
+        return filterTextByStandfordNer();
     }
 
-    public String filterTextByNER(ArrayList<String> text) throws IOException {
+    public ArrayList<String> filterTextByStandfordNer() throws IOException {
+        ArrayList<String> output = new ArrayList<String>();
 
-        String[] tokens = text.toArray(new String[text.size()]);
-        String output = new String();
-        String currentDirectory = System.getProperty("user.dir");
-        String personModelPath = currentDirectory + "\\src\\main\\java\\resources\\en-ner-person.bin";
-
-        InputStream modelIn = new FileInputStream(personModelPath);
-        TokenNameFinderModel personModel = new TokenNameFinderModel(modelIn);
-        NameFinderME persoFinder = new NameFinderME(personModel);
-
-        //Usually the first 3 names of a research papers are related to the author
-        Span personSpans[] = persoFinder.find(tokens);
-        int first3Names = 0;
-        for (Span span : personSpans) {
-            if (first3Names >= 3) {
-                break;
+//        // set up pipeline properties
+//        Properties props = new Properties();
+//        // set the list of annotators to run
+//        props.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner");
+//        // set a property for an annotator, in this case the coref annotator is being set to use the neural algorithm
+//        props.setProperty("coref.algorithm", "neural");
+//        // build pipeline
+//        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+//        // create a document object
+//        CoreDocument document = new CoreDocument("yoooo halooo Kerk ");
+//        // annnotate the document
+//        pipeline.annotate(document);
+        Sentence sent = new Sentence(this.text);
+        List<String> nerTags = sent.nerTags();  // [PERSON, O, O, O, O, O, O, O]
+        String firstPOSTag = sent.posTag(0);   // NNP
+        int i = -0;
+        for (String itterator : nerTags) {
+            if (itterator.equals("PERSON")) {
+                output.add(sent.word(i));
             }
-            output = output + "Position - " + span.toString() + "    Name - " + tokens[span.getStart()] + "\n";
-            first3Names++;
+            i++;
         }
 
         return output;
@@ -71,7 +75,6 @@ public class NameRecogniser {
         Matcher matcher = p.matcher(this.text);
         boolean found = false;
 
-        output.add(path);
         while (matcher.find()) {
             output.add(matcher.group());
             found = true;
