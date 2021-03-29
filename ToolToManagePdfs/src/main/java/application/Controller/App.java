@@ -41,7 +41,7 @@ public class App {
                 }
                 case "exit": {
                     System.out.println(">>>exiting PdfOrganiser<<<");
-                    Manager.closeAllEditors();
+                    Manager.closeAll();
                     return 1;
                 }
                 default: {
@@ -65,7 +65,7 @@ public class App {
             output.append("File not found");
         }
 
-        Manager.closeAllEditors();
+        Manager.closeAll();
         return output;
     }
 
@@ -156,6 +156,44 @@ public class App {
 ////
         GUI s = new GUI();
         s.createAndShowGUI();
+
+//        ArrayList<String> output = new ArrayList();
+//        //full names are Name Lastname so 2 CFL words seperated by whitespace are possibly a name.
+//        //"(\\b[A-Z]{1}[a-z]+)( )([A-Z]{1}[a-z]+\\b)" this regex targets standar names inside text
+//        //^([A-z\'\.-ᶜ]*(\s))+[A-z\'\.-ᶜ]*$ for names like DiMaggio St. Croix, O'Reilly butt is alone
+//        //Pattern p = Pattern.compile("(\\b[A-Z]{1}[a-z]+)( )([A-Z]{1}[a-z]+\\b)");
+//        Pattern p = Pattern.compile("^[\\w'\\-,.]*[^_!¡?÷?¿\\/\\\\+=@#$%ˆ&*(){}|~<>;:\\]]*$");
+//        Matcher matcher = p.matcher("Julien Dupraz a\n"
+//                + ", Audrey Butty a\n"
+//                + ", Olivier Duperrex a\n"
+//                + ", Sandrine Estoppey a\n"
+//                + ", Vincent Faivre a\n"
+//                + ", Julien \n"
+//                + "Thabard a\n"
+//                + ", Claire Zuppinger a\n"
+//                + ", Gilbert Greub b, c, Giuseppe Pantaleo d, e, Jérôme Pasquier a\n"
+//                + ", Valentin \n"
+//                + "Rousson a\n"
+//                + ", Malik Egger a\n"
+//                + ", Amélie Steiner-Dubuis a\n"
+//                + ", Sophie Vassaux a\n"
+//                + ", Eric Masserey f\n"
+//                + ", Murielle \n"
+//                + "Bochud* a\n"
+//                + ", Semira Gonseth Nusslé* a\n"
+//                + ", Valérie D’Acremont* a,g");
+//        boolean found = false;
+//
+//        while (matcher.find()) {
+//            output.add(matcher.group());
+//            found = true;
+//        }
+//
+//        if (!found) {
+//            System.out.println("No match found.");
+//        }
+//
+//        System.out.println(output);
 
 //
 //        editor e = new editor();

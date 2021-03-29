@@ -21,8 +21,8 @@ import java.util.logging.Logger;
  */
 public class Manager {
 
-    static List<DocumentEditor> editors = new ArrayList<>();
-    static List<NameRecogniser> nameRecognisers = new ArrayList<>();
+    static List<DocumentEditor> editors = new ArrayList<DocumentEditor>();
+    static List<NameRecogniser> nameRecognisers = new ArrayList<NameRecogniser>();
     static List<Result> results = new ArrayList<Result>();
 
     static int proccessing(File[] files) throws IOException {
@@ -73,15 +73,19 @@ public class Manager {
         return results;
     }
 
-    static int closeAllEditors() {
+    static int closeAll() {
         editors.forEach(editor -> {
             try {
                 editor.close();
+
             } catch (IOException ex) {
                 Logger.getLogger(Manager.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
         editors.clear();
+        nameRecognisers.clear();
+        results.clear();
+
         return 0;
     }
 }
