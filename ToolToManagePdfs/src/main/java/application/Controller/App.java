@@ -1,13 +1,8 @@
 package application.Controller;
 
-import application.View.Graphics;
-import java.awt.event.ActionEvent;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
-import javax.swing.JFileChooser;
 
 /**
  * Hello world!
@@ -65,88 +60,7 @@ public class App {
             output.append("File not found");
         }
 
-        Manager.closeAll();
         return output;
-    }
-
-    static class GUI extends Graphics {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // Handle open button action.
-            if (e.getSource() == openButton) {
-                int returnVal = fc.showOpenDialog(GUI.this);
-
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File[] files = fc.getSelectedFiles();
-
-                    //This is where application begins proccesing the files.
-                    String result = fileProccesing(files).toString();
-
-                    log.append(result);
-
-                    try {
-//                        // String
-//                        String s1 = "", sl = "";
-//
-//                        // File reader
-//                        FileReader fr = new FileReader(System.getProperty("user.dir") + "csv");
-//
-//                        // Buffered reader
-//                        BufferedReader br = new BufferedReader(fr);
-//
-//                        // Initilize sl
-//                        sl = br.readLine();
-//
-//                        // Take the input from the file
-//                        while ((s1 = br.readLine()) != null) {
-//                            sl = sl + "\n" + s1;
-//                        }
-
-                        // Set the text
-                        log.setText(result);
-                    } catch (Exception evt) {
-                        log.append("failed to open csv file for editing");
-                    }
-
-                } else {
-                    log.append("Open command cancelled by user.\n");
-                }
-                log.setCaretPosition(log.getDocument().getLength());
-            } else if (e.getSource() == saveButton) {
-                // Create an object of JFileChooser class
-                JFileChooser j = new JFileChooser("f:");
-
-                // Invoke the showsSaveDialog function to show the save dialog
-                int r = j.showSaveDialog(null);
-
-                if (r == JFileChooser.APPROVE_OPTION) {
-
-                    // Set the label to the path of the selected directory
-                    File fi = new File(j.getSelectedFile().getAbsolutePath());
-
-                    try {
-                        // Create a file writer
-                        FileWriter wr = new FileWriter(fi, false);
-
-                        // Create buffered writer to write
-                        BufferedWriter w = new BufferedWriter(wr);
-
-                        // Write
-                        w.write(log.getText());
-
-                        w.flush();
-                        w.close();
-                    } catch (Exception evt) {
-                        log.append(evt.getMessage());
-                    }
-                } // If the user cancelled the operation
-                else {
-                    log.append("the user cancelled the operation");
-                }
-            }
-
-        }
     }
 
     public static void main(String[] args) {
@@ -154,8 +68,14 @@ public class App {
         System.out.println(">>>PdfOrganiser v0.1<<<");
 //        System.out.println("enter command >>");
 ////
-        GUI s = new GUI();
-        s.createAndShowGUI();
+//        GUI s = new GUI();
+//        s.createAndShowGUI();
+
+        //  MyFrame f = new MyFrame();
+        GraphicalManager g = new GraphicalManager();
+        g.displayMenuGui();
+//        g.displayInfoGui();
+
 
 //        ArrayList<String> output = new ArrayList();
 //        //full names are Name Lastname so 2 CFL words seperated by whitespace are possibly a name.

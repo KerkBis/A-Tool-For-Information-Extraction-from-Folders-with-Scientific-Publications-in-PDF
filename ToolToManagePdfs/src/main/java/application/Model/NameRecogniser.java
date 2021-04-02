@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 public class NameRecogniser {
 
     private String text;
-    private String fileName;
 
     public NameRecogniser() {
 
@@ -35,10 +34,10 @@ public class NameRecogniser {
     }
 
     public ArrayList<String> findNames() throws IOException {
-//        return regexNer();
+        return regexNer();
         //return filterTextByNER();
         //return regexNerVerification(regexNer());//RegexNER -> StandfordNER verifycation -> output
-        return StandfordNer();
+        //return StandfordNer();
     }
 
     public ArrayList<String> StandfordNer() {
@@ -46,7 +45,7 @@ public class NameRecogniser {
         // set up pipeline properties
         Properties props = new Properties();
         // set the list of annotators to run
-        props.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner,depparse");
+        props.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner");
         // set a property for an annotator, in this case the coref annotator is being set to use the neural algorithm
         props.setProperty("coref.algorithm", "neural");
         // build pipeline
