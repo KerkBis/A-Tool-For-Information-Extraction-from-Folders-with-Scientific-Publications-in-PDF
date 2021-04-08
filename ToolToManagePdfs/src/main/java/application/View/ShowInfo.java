@@ -62,14 +62,14 @@ abstract public class ShowInfo extends JFrame
         submit = new JButton("Submit");
         submit.setFont(new Font("Arial", Font.PLAIN, 15));
         submit.setSize(100, 30);
-        submit.setLocation(50, 300);
+        submit.setLocation(50, 500);
         submit.addActionListener(this);
         this.add(submit);
 
         reset = new JButton("Reset");
         reset.setFont(new Font("Arial", Font.PLAIN, 15));
         reset.setSize(100, 30);
-        reset.setLocation(150, 300);
+        reset.setLocation(150, 500);
         reset.addActionListener(this);
         this.add(reset);
 

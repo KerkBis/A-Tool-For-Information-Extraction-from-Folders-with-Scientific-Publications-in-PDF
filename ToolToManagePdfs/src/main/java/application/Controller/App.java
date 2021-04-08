@@ -75,6 +75,11 @@ public class App {
         GraphicalManager g = new GraphicalManager();
         g.displayMenuGui();
 //        g.displayInfoGui();
+//        java.awt.EventQueue.invokeLater(new Runnable() {
+//            public void run() {
+//                new NamesPopUp().setVisible(true);
+//            }
+//        });
 
 
 //        ArrayList<String> output = new ArrayList();

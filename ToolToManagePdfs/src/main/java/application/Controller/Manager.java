@@ -24,6 +24,7 @@ public class Manager {
     static List<DocumentEditor> editors = new ArrayList<DocumentEditor>();
     static List<NameRecogniser> nameRecognisers = new ArrayList<NameRecogniser>();
     static List<Result> results = new ArrayList<Result>();
+    static List<Result> resultsBackUp;
 
     static int proccessing(File[] files) throws IOException {
         int i = 0;
@@ -41,6 +42,19 @@ public class Manager {
             i++;
         }
         return 0;
+    }
+
+    static void makeBackup() {
+        resultsBackUp = new ArrayList<Result>();
+        resultsBackUp = results;
+    }
+
+    static void resetResults() {
+        results = resultsBackUp;
+    }
+
+    static void modifyResults() {
+
     }
 
     static String printResults() {
