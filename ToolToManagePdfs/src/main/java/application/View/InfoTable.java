@@ -43,6 +43,12 @@ public class InfoTable extends AbstractTableModel {
     }
 
     @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return true; //To change body of generated methods, choose Tools | Templates.
+    }
+
+
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Object row = names.get(rowIndex);
         if (0 == columnIndex) {
@@ -52,29 +58,15 @@ public class InfoTable extends AbstractTableModel {
     }
 
     @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return true; //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         names.set(rowIndex, (String) aValue);
         fireTableCellUpdated(rowIndex, columnIndex); // informe any object about changes
     }
 
-    public void applyChanges() {
-        for (int i = 0; i < getRowCount(); i++) {
-            setValueAt(names.get(i), i, 0);
-        }
-    }
-
     public InfoTable(ArrayList<String> namesList) {
         int i = 0;
         setNames(namesList);
-//        for (String name : namesList) {
-//            setValueAt(name, i, 0);
-//            i++;
-//        }
+
     }
 
 }

@@ -25,6 +25,7 @@ public class PopUpTable {
     JTable nameTable;
     JButton ok;
 
+
     public PopUpTable(ArrayList<String> listOfNames) {
         frame = new JFrame();
         frame.setTitle("Full list of Names");
@@ -47,19 +48,21 @@ public class PopUpTable {
 
         ok = new JButton("Ok");
         ok.addActionListener((java.awt.event.ActionEvent evt) -> {
-            System.out.println("Ok button");
-            // model.applyChanges();
-            // nameTable.updateUI();
-
+            frame.setVisible(false);
         });
-        ok.setSize(60, 20);
-        ok.setLocation(10, 350);
+        ok.setSize(
+                60, 20);
+        ok.setLocation(
+                10, 350);
 
         frame.add(jLabel1);
+
         frame.add(jScrollPane1);
+
         frame.add(ok);
 
-        frame.setLayout(null);
+        frame.setLayout(
+                null);
     }
 
     public ArrayList<String> getNames() {
@@ -69,6 +72,8 @@ public class PopUpTable {
         }
         return names;
     }
+
+
     public JFrame getFrame() {
         return frame;
     }

@@ -53,8 +53,8 @@ public class Manager {
         results = resultsBackUp;
     }
 
-    static void modifyResults() {
-
+    static void modifyResults(Result element, int elementIndex) {
+        results.set(elementIndex, element);
     }
 
     static String printResults() {

@@ -50,7 +50,7 @@ public class InfoPanel {
         nameLabel.setLocation(10, 50);
         panel.add(nameLabel);
 
-        int moveLeft = 1;//variable to move coordinated to the left depending with the amount of elements generated
+        int moveLeft = 1;//variable to move coordinatnts to the left depending with the amount of elements generated
         int twoNamesOnly = 1;
         for (String name : names) {
 
@@ -71,6 +71,9 @@ public class InfoPanel {
         //so it is needed to create a hidden list accessed by a button
         if (names.size() > 2) {
             //by pressing this button user will be able to see the full list of names
+            names.remove(0);
+            names.remove(0);// excluding the first two that are displayed in the info form
+
             hiddenNameTable = new PopUpTable(names);
             more = new javax.swing.JButton("more");
             more.setLocation(20 * moveLeft, 100);// loacted in the left most of the components
@@ -85,11 +88,13 @@ public class InfoPanel {
 
     public ArrayList<String> getFieldContent() {
         ArrayList<String> output = new ArrayList<>();
-        //output.add(fileField.getText());
-//        for (JTextField nameFiled : nameFields) {
-//            output.add(nameFiled.getText());
-//        }
-        return hiddenNameTable.getNames();
+        //every Info Panel returns it's fields in the exact order 1rst:filename,2cnd:names
+        output.add(fileField.getText());
+        nameFields.forEach(nameFiled -> {
+            output.add(nameFiled.getText());
+        });
+        output.addAll(hiddenNameTable.getNames());
+        return output;
     }
 
     public JPanel getPanel() {

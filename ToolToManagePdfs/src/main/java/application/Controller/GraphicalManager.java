@@ -5,6 +5,7 @@
  */
 package application.Controller;
 
+import application.Model.Export;
 import application.Model.Result;
 import application.View.InfoPanel;
 import application.View.Menu;
@@ -38,7 +39,7 @@ public class GraphicalManager {
                     log.append(result);
                     Manager.makeBackup();
                     displayInfoGui(Manager.getResults());
-                    Manager.closeAll();
+                    //Manager.closeAll();
                     try {
 //                        // String
 //                        String s1 = "", sl = "";
@@ -112,12 +113,28 @@ public class GraphicalManager {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == submit) {
+                int i = 0;
                 for (InfoPanel panel : ipanels) {
-                    for (String s : panel.getFieldContent()) {
-                        System.out.print("Names for this: " + s);
-                    }
+                    String fileName = panel.getFieldContent().get(0);
+                    ArrayList<String> listOfNames = new ArrayList<>();
+                    listOfNames.addAll(panel.getFieldContent().subList(1, panel.getFieldContent().size()));
+                    Manager.modifyResults(new Result(fileName, listOfNames), i);
                     System.out.println();
+                    i++;
                 }
+                Manager.getResults().forEach(result -> {
+                    System.out.println("Filename: " + result.getFileName() + " Names: " + result.getNames() + "\n");
+
+                    JFileChooser fc = new JFileChooser();
+
+                    int returnVal = fc.showOpenDialog(InfoGui.this);
+
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        File file = fc.getSelectedFile();
+                        Export.exportToCSV(result, file);
+                    }
+                });
+
             } else if (e.getSource() == reset) {
                 Manager.resetResults();
                 // update infopanels
