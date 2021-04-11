@@ -28,7 +28,6 @@ public abstract class Menu extends JFrame
     public JTextArea log;
 
     public JButton open;
-    private JButton reset;
 
     // constructor, to initialize the components
     // with default values.

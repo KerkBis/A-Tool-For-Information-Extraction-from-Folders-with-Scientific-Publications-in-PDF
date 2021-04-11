@@ -30,12 +30,12 @@ abstract public class ShowInfo extends JFrame
 
     public JButton submit;
     public JButton reset;
+    public JButton back;
 
     public JLabel lfile;
     public JTextField tfile;
     public JLabel name;
     public JTextField tname;
-
 
     public ShowInfo() {
 
@@ -51,7 +51,6 @@ abstract public class ShowInfo extends JFrame
         title.setLocation(50, 50);
         this.add(title);
 
-
 //        ArrayList<String> als = new ArrayList<String>();
 //        als.add("Kerk");
 //        als.add("Bob");
@@ -59,6 +58,13 @@ abstract public class ShowInfo extends JFrame
 //        InfoPanel panel = new InfoPanel("fileName", als);
 //        panel.setSize(300, 50);
 //        this.add(panel);
+        back = new JButton("<--");
+        back.setFont(new Font("Arial", Font.PLAIN, 15));
+        back.setSize(60, 20);
+        back.setLocation(50, 10);
+        back.addActionListener(this);
+        this.add(back);
+
         submit = new JButton("Submit");
         submit.setFont(new Font("Arial", Font.PLAIN, 15));
         submit.setSize(100, 30);

@@ -26,7 +26,7 @@ public class Manager {
     static List<Result> results = new ArrayList<Result>();
     static List<Result> resultsBackUp;
 
-    static int proccessing(File[] files) throws IOException {
+    static int proccessing(File[] files) throws Exception {
         int i = 0;
         for (File file : files) {
             System.out.println(">>>Making editor for file:" + file.getName() + "<<<");

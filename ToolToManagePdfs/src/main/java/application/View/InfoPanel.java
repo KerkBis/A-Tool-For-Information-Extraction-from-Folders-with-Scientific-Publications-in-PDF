@@ -21,10 +21,10 @@ public class InfoPanel {
 
     JPanel panel;
     JLabel fileLabel;
-    JTextField fileField;
+    public JTextField fileField;
     JLabel nameLabel;
     ArrayList<JTextField> nameFields = new ArrayList<>();
-    PopUpTable hiddenNameTable;
+    InfoPopUpTable hiddenNameTable;
     JButton more;
 
     public InfoPanel(String fileName, ArrayList<String> names) {
@@ -55,8 +55,9 @@ public class InfoPanel {
         for (String name : names) {
 
             if (twoNamesOnly > 2) {
-                break; //
+                break;
             }
+
             JTextField tname = new JTextField(name);
             tname.setFont(new Font("Arial", Font.PLAIN, 15));
             tname.setSize(150, 20);
@@ -74,7 +75,7 @@ public class InfoPanel {
             names.remove(0);
             names.remove(0);// excluding the first two that are displayed in the info form
 
-            hiddenNameTable = new PopUpTable(names);
+            hiddenNameTable = new InfoPopUpTable(names);
             more = new javax.swing.JButton("more");
             more.setLocation(20 * moveLeft, 100);// loacted in the left most of the components
             more.addActionListener((java.awt.event.ActionEvent evt) -> {
@@ -93,7 +94,13 @@ public class InfoPanel {
         nameFields.forEach(nameFiled -> {
             output.add(nameFiled.getText());
         });
-        output.addAll(hiddenNameTable.getNames());
+        Class c = new ClassLoader() {
+            Class c = findLoadedClass("hiddenNameTable");
+        }.c;
+        if (c != null) {
+            output.addAll(hiddenNameTable.getNames());
+        }
+
         return output;
     }
 

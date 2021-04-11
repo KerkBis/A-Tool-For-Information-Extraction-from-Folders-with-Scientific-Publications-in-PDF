@@ -10,17 +10,23 @@ import application.Model.Result;
 import application.View.InfoPanel;
 import application.View.Menu;
 import application.View.ShowInfo;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 /**
  *
  * @author tamag
  */
 public class GraphicalManager {
+
+    MenuGui m;
+    InfoGui i;
 
     public class MenuGui extends Menu {
 
@@ -39,26 +45,8 @@ public class GraphicalManager {
                     log.append(result);
                     Manager.makeBackup();
                     displayInfoGui(Manager.getResults());
-                    //Manager.closeAll();
+                    setVisible(false);
                     try {
-//                        // String
-//                        String s1 = "", sl = "";
-//
-//                        // File reader
-//                        FileReader fr = new FileReader(System.getProperty("user.dir") + "csv");
-//
-//                        // Buffered reader
-//                        BufferedReader br = new BufferedReader(fr);
-//
-//                        // Initilize sl
-//                        sl = br.readLine();
-//
-//                        // Take the input from the lfile
-//                        while ((s1 = br.readLine()) != null) {
-//                            sl = sl + "\n" + s1;
-//                        }
-
-                        // Set the text
                         log.setText(result);
                     } catch (Exception evt) {
                         log.append("failed to open csv file for editing");
@@ -75,8 +63,8 @@ public class GraphicalManager {
     }
 
     public class InfoGui extends ShowInfo {
-
         public List<InfoPanel> ipanels = new ArrayList<>();
+        JScrollPane jScrollPane1;
 
         public void createInfoPanels(List<Result> results) {
 
@@ -86,25 +74,24 @@ public class GraphicalManager {
         }
 
         public InfoGui(List<Result> results) {
-            //super();
-
-//            ArrayList<String> als = new ArrayList<String>();
-//            als.add("Kerk");
-//            als.add("Bob");
-//            als.add("john");
-//            InfoPanel panel = new InfoPanel("fileName", als);
-//            panel.setSize(300, 50);
-//            this.add(panel);
             createInfoPanels(results);
+            JPanel contentPanel = new JPanel();
+//            new BoxLayout(contentPanel, BoxLayout.Y_AXIS)
+            contentPanel.setLayout(new GridLayout(ipanels.size(), 1, 5, 5));
+            jScrollPane1 = new JScrollPane();
+            jScrollPane1.setSize(800, 300);
+            jScrollPane1.setLocation(50, 100);
+            //jScrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
             int moveDown = 0;
             for (InfoPanel panel : ipanels) {
                 panel.getPanel().setSize(500, 60);
-                panel.getPanel().setLocation(50, 100 + moveDown);
+                panel.getPanel().setLocation(10, 10 + moveDown);
+                contentPanel.add(panel.getPanel());
                 moveDown = moveDown + 70;
-                add(panel.getPanel());
             }
-
+            add(jScrollPane1);
+            jScrollPane1.setViewportView(contentPanel);
             setLayout(null);
             this.getContentPane();
             this.setVisible(true);
@@ -122,31 +109,37 @@ public class GraphicalManager {
                     System.out.println();
                     i++;
                 }
-                Manager.getResults().forEach(result -> {
-                    System.out.println("Filename: " + result.getFileName() + " Names: " + result.getNames() + "\n");
+                JFileChooser fc = new JFileChooser();
 
-                    JFileChooser fc = new JFileChooser();
-
-                    int returnVal = fc.showOpenDialog(InfoGui.this);
-
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        File file = fc.getSelectedFile();
-                        Export.exportToCSV(result, file);
-                    }
-                });
+                int returnVal = fc.showOpenDialog(InfoGui.this);
+                fc.showSaveDialog(null);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    Export.exportToCSV(Manager.getResults(), file);
+                }
 
             } else if (e.getSource() == reset) {
-                Manager.resetResults();
-                // update infopanels
+                dispose();
+                new InfoGui(Manager.getResults());// update infopanels
+            } else if (e.getSource() == back) {
+                setVisible(false);
+                m.setVisible(true);
+                dispose();
+                Manager.closeAll();
+
             }
         }
     }
 
     public void displayMenuGui() {
-        MenuGui m = new MenuGui();
+        m = new MenuGui();
     }
 
     public void displayInfoGui(List<Result> results) {
-        InfoGui i = new InfoGui(results);
+        i = new InfoGui(results);
     }
+
+//    public GraphicalManager() {
+//        displayMenuGui();
+//    }
 }

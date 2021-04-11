@@ -1,7 +1,6 @@
 package application.Controller;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Scanner;
 
 /**
@@ -56,88 +55,91 @@ public class App {
             Manager.proccessing(files);
             output.append(Manager.printResults());
 //            output.append(Manager.printName());
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             output.append("File not found");
         }
 
         return output;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         System.out.println(">>>PdfOrganiser v0.1<<<");
 //        System.out.println("enter command >>");
-////
-//        GUI s = new GUI();
-//        s.createAndShowGUI();
-
-        //  MyFrame f = new MyFrame();
         GraphicalManager g = new GraphicalManager();
         g.displayMenuGui();
-//        g.displayInfoGui();
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                new NamesPopUp().setVisible(true);
-//            }
-//        });
-
-
-//        ArrayList<String> output = new ArrayList();
-//        //full names are Name Lastname so 2 CFL words seperated by whitespace are possibly a name.
-//        //"(\\b[A-Z]{1}[a-z]+)( )([A-Z]{1}[a-z]+\\b)" this regex targets standar names inside text
-//        //^([A-z\'\.-ᶜ]*(\s))+[A-z\'\.-ᶜ]*$ for names like DiMaggio St. Croix, O'Reilly butt is alone
-//        //Pattern p = Pattern.compile("(\\b[A-Z]{1}[a-z]+)( )([A-Z]{1}[a-z]+\\b)");
-//        Pattern p = Pattern.compile("^[\\w'\\-,.]*[^_!¡?÷?¿\\/\\\\+=@#$%ˆ&*(){}|~<>;:\\]]*$");
-//        Matcher matcher = p.matcher("Julien Dupraz a\n"
-//                + ", Audrey Butty a\n"
-//                + ", Olivier Duperrex a\n"
-//                + ", Sandrine Estoppey a\n"
-//                + ", Vincent Faivre a\n"
-//                + ", Julien \n"
-//                + "Thabard a\n"
-//                + ", Claire Zuppinger a\n"
-//                + ", Gilbert Greub b, c, Giuseppe Pantaleo d, e, Jérôme Pasquier a\n"
-//                + ", Valentin \n"
-//                + "Rousson a\n"
-//                + ", Malik Egger a\n"
-//                + ", Amélie Steiner-Dubuis a\n"
-//                + ", Sophie Vassaux a\n"
-//                + ", Eric Masserey f\n"
-//                + ", Murielle \n"
-//                + "Bochud* a\n"
-//                + ", Semira Gonseth Nusslé* a\n"
-//                + ", Valérie D’Acremont* a,g");
-//        boolean found = false;
-//
-//        while (matcher.find()) {
-//            output.add(matcher.group());
-//            found = true;
-//        }
-//
-//        if (!found) {
-//            System.out.println("No match found.");
-//        }
-//
-//        System.out.println(output);
-
-//
-//        editor e = new editor();
-
-//        JFrame frame = new JFrame("FileChooserDemo");
-//        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        frame.setSize(400, 400);
-//        frame.setVisible(true);
-//        Scanner keyboard = new Scanner(System.in);
-//        commandHandler(keyboard);
 
 //        String currentDirectory = System.getProperty("user.dir");
 //        String relativePath = currentDirectory + "\\src\\main\\java\\resources\\";
-//        File f = new File(relativePath + "testDoc2.pdf");
-//        DocumentEditor dc = new DocumentEditor(f);
-//        NameRecogniser nm = new NameRecogniser(dc.getPath(), dc.getScannedText());
-//        ArrayList<String> filterTextByRegex = nm.filterTextByRegex();
-//        String exportToCSV = Export.exportToCSV(filterTextByRegex);
-//        System.out.println("the ouput: \n" + exportToCSV);
+//        String serializedClassifier = relativePath + "english.all.3class.distsim.crf.ser.gz";
+//
+//        if (args.length > 0) {
+//            serializedClassifier = args[0];
+//        }
+//
+//        AbstractSequenceClassifier<CoreLabel> classifier = CRFClassifier.getClassifier(serializedClassifier);
+//
+//        /* For either a file to annotate or for the hardcoded text example, this
+//       demo file shows several ways to process the input, for teaching purposes.
+//         */
+//        String[] example = {"Good afternoon Rajat Raina, how are you today?",
+//            "I go to school at Stanford University, which is located in California."};
+
+//        for (String str : example) {
+//            System.out.println(classifier.classifyToString(str));
+//        }
+//        System.out.println("---");
+//        for (String str : example) {
+//            // This one puts in spaces and newlines between tokens, so just print not println.
+//            System.out.print(classifier.classifyToString(str, "slashTags", false));
+//        }
+//        System.out.println("---");
+//
+//        for (String str : example) {
+//            // This one is best for dealing with the output as a TSV (tab-separated column) file.
+//            // The first column gives entities, the second their classes, and the third the remaining text in a document
+//            System.out.print(classifier.classifyToString(str, "tabbedEntities", false));
+//        }
+//        System.out.println("---");
+//        for (String str : example) {
+//            System.out.println(classifier.classifyWithInlineXML(str));
+//        }
+//        System.out.println("---");
+////
+//        for (String str : example) {
+//            System.out.println(classifier.classifyToString(str, "xml", true));
+//        }
+//        System.out.println("---");
+////
+//        for (String str : example) {
+//            System.out.print(classifier.classifyToString(str, "tsv", false));
+//        }
+//        System.out.println("---");
+//
+        // This gets out entities with character offsets
+//        int j = 0;
+//        for (String str : example) {
+//            j++;
+//            List<Triple<String, Integer, Integer>> triples = classifier.classifyToCharacterOffsets(str);
+//            for (Triple<String, Integer, Integer> trip : triples) {
+//                System.out.printf("%s over character offsets [%d, %d) in sentence %d.%n",
+//                        trip.first(), trip.second(), trip.third, j);
+//            }
+//        }
+//        System.out.println("---");
+////
+//        // This prints out all the details of what is stored for each token
+//        int i = 0;
+//        for (String str : example) {
+//            for (List<CoreLabel> lcl : classifier.classify(str)) {
+//                for (CoreLabel cl : lcl) {
+//                    System.out.print(i++ + ": ");
+//                    System.out.println(cl.toShorterString());
+//                }
+//            }
+//        }
+//
+//        System.out.println("---");
     }
 
 }

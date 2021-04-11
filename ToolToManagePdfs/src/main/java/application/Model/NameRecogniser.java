@@ -5,16 +5,18 @@
  */
 package application.Model;
 
+import edu.stanford.nlp.ie.AbstractSequenceClassifier;
+import edu.stanford.nlp.ie.crf.CRFClassifier;
+import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreEntityMention;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.simple.*;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -33,10 +35,10 @@ public class NameRecogniser {
 
     }
 
-    public ArrayList<String> findNames() throws IOException {
-        return regexNer();
+    public ArrayList<String> findNames() throws Exception {
+//        return regexNer();
         //return filterTextByNER();
-        //return regexNerVerification(regexNer());//RegexNER -> StandfordNER verifycation -> output
+        return regexNerVerification(regexNer());//RegexNER -> StandfordNER verifycation -> output
         //return StandfordNer();
     }
 
@@ -64,7 +66,6 @@ public class NameRecogniser {
             }
         }
 
-
 //        Sentence sent = new Sentence(this.text);
 //        List<String> nerTags = sent.nerTags();  // [PERSON, O, O, O, O, O, O, O]
 //        String firstPOSTag = sent.posTag(0);   // NNP
@@ -79,17 +80,36 @@ public class NameRecogniser {
         return output;
     }
 
-    public ArrayList<String> regexNerVerification(ArrayList<String> regexDetectedNames) throws IOException {
+    public ArrayList<String> regexNerVerification(ArrayList<String> regexDetectedNames) throws Exception {
         ArrayList<String> output = new ArrayList<String>();
 
+        String currentDirectory = System.getProperty("user.dir");
+        String relativePath = currentDirectory + "\\src\\main\\java\\resources\\";
+        String serializedClassifier = relativePath + "english.all.3class.distsim.crf.ser.gz";
+
+        AbstractSequenceClassifier<CoreLabel> classifier = CRFClassifier.getClassifier(serializedClassifier);
+
         for (String pname : regexDetectedNames) {
-            Sentence pnameSent = new Sentence(pname);
-            List<String> nerTags = pnameSent.nerTags();  // [PERSON, O, O, O, O, O, O, O]
-            if (nerTags.contains("PERSON") && !nerTags.contains("LOCATION")) {
-                output.add(pname);
+//            Sentence pnameSent = new Sentence(pname);
+//            List<String> nerTags = pnameSent.nerTags();  // [PERSON, O, O, O, O, O, O, O]
+//            if (nerTags.contains("PERSON") && !nerTags.contains("LOCATION")) {
+//                output.add(pname);
+//            }
+            String name = classifier.classifyToString(pname);
+            if (name.contains("/PERSON")) {
+                name = name.replace("/PERSON", "");
+                name = name.replace("/O", "");
+                output.add(name);
             }
         }
-
+        //discard duplicate Names
+        List<String> original = output;
+        List<String> result = new ArrayList<>();
+        result = original.stream()
+                .distinct()
+                .collect(Collectors.toList());
+        output.clear();
+        output.addAll(result.subList(0, result.size()));
         return output;
     }
 
