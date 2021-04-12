@@ -28,6 +28,8 @@ public class InfoPanel {
     JButton more;
 
     public InfoPanel(String fileName, ArrayList<String> names) {
+
+        ArrayList<String> listOfNames = names;
         panel = new JPanel();
         panel.setBackground(Color.lightGray);
         panel.setBounds(40, 80, 200, 200);
@@ -52,7 +54,7 @@ public class InfoPanel {
 
         int moveLeft = 1;//variable to move coordinatnts to the left depending with the amount of elements generated
         int twoNamesOnly = 1;
-        for (String name : names) {
+        for (String name : listOfNames) {
 
             if (twoNamesOnly > 2) {
                 break;
@@ -68,14 +70,14 @@ public class InfoPanel {
             twoNamesOnly++;
         }
 
+        hiddenNameTable = null;
         //If the list of names is bigger than two they wont fit inside InfoPanel
         //so it is needed to create a hidden list accessed by a button
         if (names.size() > 2) {
             //by pressing this button user will be able to see the full list of names
-            names.remove(0);
-            names.remove(0);// excluding the first two that are displayed in the info form
+            //listOfNames = ; / excluding the first two that are displayed in the info form
 
-            hiddenNameTable = new InfoPopUpTable(names);
+            hiddenNameTable = new InfoPopUpTable(new ArrayList<String>(names.subList(2, names.size())));
             more = new javax.swing.JButton("more");
             more.setLocation(20 * moveLeft, 100);// loacted in the left most of the components
             more.addActionListener((java.awt.event.ActionEvent evt) -> {
@@ -94,10 +96,8 @@ public class InfoPanel {
         nameFields.forEach(nameFiled -> {
             output.add(nameFiled.getText());
         });
-        Class c = new ClassLoader() {
-            Class c = findLoadedClass("hiddenNameTable");
-        }.c;
-        if (c != null) {
+
+        if (hiddenNameTable != null) {
             output.addAll(hiddenNameTable.getNames());
         }
 

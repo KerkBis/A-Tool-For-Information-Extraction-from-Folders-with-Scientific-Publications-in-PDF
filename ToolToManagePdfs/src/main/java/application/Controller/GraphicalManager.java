@@ -40,22 +40,25 @@ public class GraphicalManager {
                     File[] files = fc.getSelectedFiles();
 
                     //This is where application begins proccesing the files.
-                    String result = App.fileProccesing(files).toString();
+//                    String result =
+                    App.fileProccesing(files);
+//                                    .toString();
 
-                    log.append(result);
-                    Manager.makeBackup();
+//                    log.append(result);
+                    // Manager.makeBackup();
                     displayInfoGui(Manager.getResults());
-                    setVisible(false);
-                    try {
-                        log.setText(result);
-                    } catch (Exception evt) {
-                        log.append("failed to open csv file for editing");
-                    }
 
-                } else {
-                    log.append("Open command cancelled by user.\n");
-                }
-                log.setCaretPosition(log.getDocument().getLength());
+                    setVisible(false);
+//                    try {
+//                        log.setText(result);
+//                    } catch (Exception evt) {
+//                        log.append("failed to open csv file for editing");
+//                    }
+
+                } //else {
+//                    log.append("Open command cancelled by user.\n");
+//                }
+//                log.setCaretPosition(log.getDocument().getLength());
             }
 
         }
@@ -63,14 +66,15 @@ public class GraphicalManager {
     }
 
     public class InfoGui extends ShowInfo {
+
         public List<InfoPanel> ipanels = new ArrayList<>();
         JScrollPane jScrollPane1;
 
         public void createInfoPanels(List<Result> results) {
 
-            for (Result result : results) {
+            results.forEach(result -> {
                 this.ipanels.add(new InfoPanel(result.getFileName(), result.getNames()));
-            }
+            });
         }
 
         public InfoGui(List<Result> results) {
@@ -120,7 +124,8 @@ public class GraphicalManager {
 
             } else if (e.getSource() == reset) {
                 dispose();
-                new InfoGui(Manager.getResults());// update infopanels
+                displayInfoGui(Manager.getResults());// update infopanels
+
             } else if (e.getSource() == back) {
                 setVisible(false);
                 m.setVisible(true);

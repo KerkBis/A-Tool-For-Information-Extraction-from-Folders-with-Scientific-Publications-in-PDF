@@ -23,7 +23,7 @@ public class Manager {
 
     static List<DocumentEditor> editors = new ArrayList<DocumentEditor>();
     static List<NameRecogniser> nameRecognisers = new ArrayList<NameRecogniser>();
-    static List<Result> results = new ArrayList<Result>();
+    final private static List<Result> results = new ArrayList<Result>();
     static List<Result> resultsBackUp;
 
     static int proccessing(File[] files) throws Exception {
@@ -49,21 +49,21 @@ public class Manager {
         resultsBackUp = results;
     }
 
-    static void resetResults() {
-        results = resultsBackUp;
-    }
+//    static void resetResults() {
+//        results = resultsBackUp;
+//    }
 
     static void modifyResults(Result element, int elementIndex) {
         results.set(elementIndex, element);
     }
 
-    static String printResults() {
+    public static String printResults() {
         String output = new String();
         for (Result result : results) {
 //            output = output + "For file: " + result.getFileName() + " Names found: " + result.getNames() + "\n";
             output = output + "For file: " + result.getFileName() + " Names found: " + result.getNames() + "\n";
         }
-        return output;
+        return output + "--------------------------------";
     }
 
     static String printText() {
