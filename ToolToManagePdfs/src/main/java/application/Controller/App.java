@@ -68,6 +68,7 @@ public class App {
 //        System.out.println("enter command >>");
         GraphicalManager g = new GraphicalManager();
         g.displayMenuGui();
+//        GridBagLayoutExample a = new GridBagLayoutExample();
 
     }
 

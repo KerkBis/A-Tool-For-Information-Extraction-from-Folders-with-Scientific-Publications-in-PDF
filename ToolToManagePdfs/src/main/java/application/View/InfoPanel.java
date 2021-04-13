@@ -7,6 +7,8 @@ package application.View;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -28,31 +30,37 @@ public class InfoPanel {
     JButton more;
 
     public InfoPanel(String fileName, ArrayList<String> names) {
+        GridBagLayout layout = new GridBagLayout();
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
 
         ArrayList<String> listOfNames = names;
         panel = new JPanel();
         panel.setBackground(Color.lightGray);
-        panel.setBounds(40, 80, 200, 200);
+
 
         fileLabel = new JLabel("File");
         fileLabel.setFont(new Font("Arial", Font.PLAIN, 20));
         fileLabel.setSize(100, 20);
-        fileLabel.setLocation(0, 100);
-        panel.add(fileLabel);
+        panel.add(fileLabel, gbc);
 
         fileField = new JTextField(fileName);
         fileField.setFont(new Font("Arial", Font.PLAIN, 15));
         fileField.setSize(50, 20);
-        fileField.setLocation(10, 100);
-        panel.add(fileField);
+        gbc.gridx++;
+        gbc.gridy = 0;
+        panel.add(fileField, gbc);
 
         nameLabel = new JLabel("Names");
         nameLabel.setFont(new Font("Arial", Font.PLAIN, 20));
         nameLabel.setSize(100, 20);
-        nameLabel.setLocation(10, 50);
-        panel.add(nameLabel);
+        gbc.gridx++;
+        gbc.gridy = 0;
+        panel.add(nameLabel, gbc);
 
-        int moveLeft = 1;//variable to move coordinatnts to the left depending with the amount of elements generated
         int twoNamesOnly = 1;
         for (String name : listOfNames) {
 
@@ -63,10 +71,11 @@ public class InfoPanel {
             JTextField tname = new JTextField(name);
             tname.setFont(new Font("Arial", Font.PLAIN, 15));
             tname.setSize(150, 20);
-            tname.setLocation(20 * moveLeft, 100);
+            gbc.gridx++;
+            gbc.gridy = 0;
+            panel.add(tname, gbc);
+
             nameFields.add(tname);
-            panel.add(tname);
-            moveLeft++;
             twoNamesOnly++;
         }
 
@@ -79,12 +88,13 @@ public class InfoPanel {
 
             hiddenNameTable = new InfoPopUpTable(new ArrayList<String>(names.subList(2, names.size())));
             more = new javax.swing.JButton("more");
-            more.setLocation(20 * moveLeft, 100);// loacted in the left most of the components
+            gbc.gridx++;
+            gbc.gridy = 0;
+            panel.add(more, gbc);
             more.addActionListener((java.awt.event.ActionEvent evt) -> {
                 //hiddenNameTable.getFrame();
                 hiddenNameTable.getFrame().setVisible(true);
             });
-            panel.add(more);
         }
 
     }

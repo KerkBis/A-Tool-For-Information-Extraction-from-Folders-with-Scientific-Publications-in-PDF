@@ -24,21 +24,29 @@ import java.util.stream.Collectors;
  */
 public class NameRecogniser {
 
+    String serializedClassifier;
+    AbstractSequenceClassifier<CoreLabel> classifier;
     private String text;
 
-    public NameRecogniser() {
-
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public NameRecogniser(String inputText) {
+    public NameRecogniser() throws Exception {
+//        serializedClassifier = "classifiers/english.all.3class.distsim.crf.ser.gz";
+//        classifier = CRFClassifier.getClassifier(serializedClassifier);
+    }
+
+    public NameRecogniser(String inputText) throws Exception {
+        serializedClassifier = "classifiers/english.all.3class.distsim.crf.ser.gz";
+        classifier = CRFClassifier.getClassifier(serializedClassifier);
         this.text = inputText;
 
     }
 
     public ArrayList<String> findNames() throws Exception {
-//        return regexNer();
-        //return filterTextByNER();
-        return regexNerVerification(regexNer());//RegexNER -> StandfordNER verifycation -> output
+        return regexNer();
+//        return regexNerVerification(regexNer());//RegexNER -> StandfordNER verifycation -> output
         //return StandfordNer();
     }
 
@@ -83,18 +91,7 @@ public class NameRecogniser {
     public ArrayList<String> regexNerVerification(ArrayList<String> regexDetectedNames) throws Exception {
         ArrayList<String> output = new ArrayList<String>();
 
-        String currentDirectory = System.getProperty("user.dir");
-        String relativePath = currentDirectory + "\\src\\main\\java\\resources\\";
-        String serializedClassifier = relativePath + "english.all.3class.distsim.crf.ser.gz";
-
-        AbstractSequenceClassifier<CoreLabel> classifier = CRFClassifier.getClassifier(serializedClassifier);
-
         for (String pname : regexDetectedNames) {
-//            Sentence pnameSent = new Sentence(pname);
-//            List<String> nerTags = pnameSent.nerTags();  // [PERSON, O, O, O, O, O, O, O]
-//            if (nerTags.contains("PERSON") && !nerTags.contains("LOCATION")) {
-//                output.add(pname);
-//            }
             String name = classifier.classifyToString(pname);
             if (name.contains("/PERSON")) {
                 name = name.replace("/PERSON", "");

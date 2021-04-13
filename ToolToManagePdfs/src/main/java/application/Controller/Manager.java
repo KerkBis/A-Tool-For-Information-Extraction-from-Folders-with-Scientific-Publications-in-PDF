@@ -22,25 +22,45 @@ import java.util.logging.Logger;
 public class Manager {
 
     static List<DocumentEditor> editors = new ArrayList<DocumentEditor>();
-    static List<NameRecogniser> nameRecognisers = new ArrayList<NameRecogniser>();
+    static NameRecogniser nameRecogniser;
     final private static List<Result> results = new ArrayList<Result>();
     static List<Result> resultsBackUp;
+    static List<DocumentProduct> products = new ArrayList<>();
+
+    static class DocumentProduct {
+
+        String fileName;
+        String scannedText;
+
+        public DocumentProduct(String fileName, String scannedText) {
+            this.fileName = fileName;
+            this.scannedText = scannedText;
+        }
+    }
 
     static int proccessing(File[] files) throws Exception {
-        int i = 0;
+
         for (File file : files) {
             System.out.println(">>>Making editor for file:" + file.getName() + "<<<");
-            editors.add(new DocumentEditor(file));
-            //for every editor create a NameRecogniser to analyse it's scanned text
-            String scannedText = editors.get(i).getScannedText();
-            nameRecognisers.add(new NameRecogniser(scannedText));
-            //for every NameRecogniser create a Result
-            String fileName = editors.get(i).getFileName();
-            ArrayList<String> names = nameRecognisers.get(i).findNames();
-            results.add(new Result(fileName, names));
+            DocumentEditor docEditor = new DocumentEditor(file);
+            editors.add(docEditor);
+            //make a list of scanned text and file names
+            DocumentProduct p = new DocumentProduct(docEditor.getFileName(), docEditor.getScannedText());
+            products.add(p);
 
-            i++;
         }
+        //initialise NER
+        nameRecogniser = new NameRecogniser();
+        for (DocumentProduct product : products) {
+            //Analyse text with NER 
+            nameRecogniser.setText(product.scannedText);
+            nameRecogniser.findNames();
+            //and create list of Results
+            ArrayList<String> names = nameRecogniser.findNames();
+            String fileName = product.fileName;
+            results.add(new Result(fileName, names));
+        }
+
         return 0;
     }
 
@@ -52,7 +72,6 @@ public class Manager {
 //    static void resetResults() {
 //        results = resultsBackUp;
 //    }
-
     static void modifyResults(Result element, int elementIndex) {
         results.set(elementIndex, element);
     }
@@ -82,7 +101,6 @@ public class Manager {
         return output;
     }
 
-
     static List<Result> getResults() {
         return results;
     }
@@ -97,7 +115,7 @@ public class Manager {
             }
         });
         editors.clear();
-        nameRecognisers.clear();
+        products.clear();
         results.clear();
 
         return 0;
