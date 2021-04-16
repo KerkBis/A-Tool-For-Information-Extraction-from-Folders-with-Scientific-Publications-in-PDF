@@ -8,6 +8,7 @@ package application.View;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -58,9 +59,10 @@ abstract public class ShowInfo extends JFrame
 //        InfoPanel panel = new InfoPanel("fileName", als);
 //        panel.setSize(300, 50);
 //        this.add(panel);
-        back = new JButton("<--");
+
+        back = new JButton(new ImageIcon("src\\main\\java\\resources\\back.png"));
         back.setFont(new Font("Arial", Font.PLAIN, 15));
-        back.setSize(60, 20);
+        back.setSize(46, 33);
         back.setLocation(50, 10);
         back.addActionListener(this);
         this.add(back);

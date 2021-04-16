@@ -5,7 +5,7 @@
  */
 package application.View;
 
-import java.util.ArrayList;
+import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 /**
@@ -14,13 +14,13 @@ import javax.swing.table.AbstractTableModel;
  */
 public class NameTable extends AbstractTableModel {
 
-    private ArrayList<String> names;
+    private List<String> names;
 
     private final String[] columnNames = new String[]{
         "Names"
     };
 
-    public void setNames(ArrayList<String> names) {
+    public void setNames(List<String> names) {
         this.names = names;
     }
 //    public ArrayList<String> getNames() {
@@ -63,7 +63,7 @@ public class NameTable extends AbstractTableModel {
         fireTableCellUpdated(rowIndex, columnIndex); // informe any object about changes
     }
 
-    public NameTable(ArrayList<String> namesList) {
+    public NameTable(List<String> namesList) {
         int i = 0;
         setNames(namesList);
 

@@ -23,7 +23,7 @@ public class Manager {
 
     static List<DocumentEditor> editors = new ArrayList<DocumentEditor>();
     static NameRecogniser nameRecogniser;
-    final private static List<Result> results = new ArrayList<Result>();
+    private static List<Result> results = new ArrayList<Result>();
     static List<Result> resultsBackUp;
     static List<DocumentProduct> products = new ArrayList<>();
 
@@ -69,9 +69,9 @@ public class Manager {
         resultsBackUp = results;
     }
 
-//    static void resetResults() {
-//        results = resultsBackUp;
-//    }
+    static void resetResults() {
+        results = resultsBackUp;
+    }
     static void modifyResults(Result element, int elementIndex) {
         results.set(elementIndex, element);
     }

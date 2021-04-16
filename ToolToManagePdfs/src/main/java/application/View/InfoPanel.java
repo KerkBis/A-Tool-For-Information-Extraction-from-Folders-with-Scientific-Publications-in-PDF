@@ -5,11 +5,12 @@
  */
 package application.View;
 
-import java.awt.Color;
-import java.awt.Font;
+import application.Model.Result;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Label;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,102 +20,141 @@ import javax.swing.JTextField;
  *
  * @author tamag
  */
-public class InfoPanel {
+public class InfoPanel extends JPanel {
 
     JPanel panel;
     JLabel fileLabel;
-    public JTextField fileField;
     JLabel nameLabel;
     ArrayList<JTextField> nameFields = new ArrayList<>();
-    InfoPopUpTable hiddenNameTable;
+    ArrayList<Entry> entries = new ArrayList<>();
     JButton more;
 
-    public InfoPanel(String fileName, ArrayList<String> names) {
-        GridBagLayout layout = new GridBagLayout();
-        GridBagConstraints gbc = new GridBagConstraints();
+    public class Entry {
 
-        gbc.fill = GridBagConstraints.VERTICAL;
+        JTextField fileField;
+        ArrayList<JTextField> nameFields = new ArrayList<>();
+        InfoPopUpTable hiddenNamesTable = null;
+
+        public Entry(String fileName, List<String> names) {
+            this.fileField = new JTextField(fileName);
+
+            if (names.size() > 2) {
+                this.nameFields.add(new JTextField(names.get(0)));
+                this.nameFields.add(new JTextField(names.get(1)));
+                this.hiddenNamesTable = new InfoPopUpTable(names.subList(1, names.size()));
+            } else {
+                for (String name : names) {
+                    this.nameFields.add(new JTextField(name));
+                }
+            }
+        }
+
+        public boolean hiddenNamesExists() {
+            return hiddenNamesTable != null;
+        }
+    }
+
+    public void createEntries(List<Result> results) {
+        results.forEach(result -> {
+            entries.add(new Entry(result.getFileName(), result.getNames()));
+        });
+    }
+
+    public InfoPanel(List<Result> results) {
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        GridBagLayout layout = new GridBagLayout();
+        this.setLayout(layout);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 0;
 
-        ArrayList<String> listOfNames = names;
-        panel = new JPanel();
-        panel.setBackground(Color.lightGray);
+        createEntries(results);
 
-
-        fileLabel = new JLabel("File");
-        fileLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-        fileLabel.setSize(100, 20);
-        panel.add(fileLabel, gbc);
-
-        fileField = new JTextField(fileName);
-        fileField.setFont(new Font("Arial", Font.PLAIN, 15));
-        fileField.setSize(50, 20);
-        gbc.gridx++;
-        gbc.gridy = 0;
-        panel.add(fileField, gbc);
-
-        nameLabel = new JLabel("Names");
-        nameLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-        nameLabel.setSize(100, 20);
-        gbc.gridx++;
-        gbc.gridy = 0;
-        panel.add(nameLabel, gbc);
-
-        int twoNamesOnly = 1;
-        for (String name : listOfNames) {
-
-            if (twoNamesOnly > 2) {
-                break;
-            }
-
-            JTextField tname = new JTextField(name);
-            tname.setFont(new Font("Arial", Font.PLAIN, 15));
-            tname.setSize(150, 20);
+        entries.forEach(entry -> {
+            this.add(new Label("FILE"), gbc);
             gbc.gridx++;
-            gbc.gridy = 0;
-            panel.add(tname, gbc);
 
-            nameFields.add(tname);
-            twoNamesOnly++;
-        }
-
-        hiddenNameTable = null;
-        //If the list of names is bigger than two they wont fit inside InfoPanel
-        //so it is needed to create a hidden list accessed by a button
-        if (names.size() > 2) {
-            //by pressing this button user will be able to see the full list of names
-            //listOfNames = ; / excluding the first two that are displayed in the info form
-
-            hiddenNameTable = new InfoPopUpTable(new ArrayList<String>(names.subList(2, names.size())));
-            more = new javax.swing.JButton("more");
+            this.add(entry.fileField, gbc);
             gbc.gridx++;
-            gbc.gridy = 0;
-            panel.add(more, gbc);
-            more.addActionListener((java.awt.event.ActionEvent evt) -> {
-                //hiddenNameTable.getFrame();
-                hiddenNameTable.getFrame().setVisible(true);
+
+            this.add(new Label("NAMES"), gbc);
+            gbc.gridx++;
+
+            entry.nameFields.forEach((nameField) -> {
+                this.add(nameField, gbc);
+                gbc.gridx++;
             });
-        }
-
-    }
-
-    public ArrayList<String> getFieldContent() {
-        ArrayList<String> output = new ArrayList<>();
-        //every Info Panel returns it's fields in the exact order 1rst:filename,2cnd:names
-        output.add(fileField.getText());
-        nameFields.forEach(nameFiled -> {
-            output.add(nameFiled.getText());
+            if (entry.hiddenNamesExists()) {
+                JButton b = new JButton("more");
+                b.addActionListener((e) -> {
+                    entry.hiddenNamesTable.getFrame().setVisible(true);
+                });
+                this.add(b, gbc);
+            }
+            gbc.gridx = 0;
+            gbc.gridy++;
         });
 
-        if (hiddenNameTable != null) {
-            output.addAll(hiddenNameTable.getNames());
-        }
-
-        return output;
+//        for (Result result : results) {
+//            this.add(new Label("FILE"), gbc);
+//
+//            gbc.gridx++;
+//            JTextField tfile = new JTextField(result.getFileName());
+//            this.add(tfile, gbc);
+//            gbc.gridx++;
+//            this.add(new Label("NAMES"), gbc);
+//            gbc.gridx++;
+//            int counter = 1;
+//            for (String name : result.getNames()) {
+//
+//                JTextField tname = new JTextField(name);
+//                this.add(tname, gbc);
+//                nameFields.add(tname);
+//                gbc.gridx++;
+//
+//                if (counter > 2) {
+//                    InfoPopUpTable hiddenNameTable = new InfoPopUpTable(new ArrayList<String>(
+//                            result.getNames().subList(
+//                                    2, result.getNames().size()
+//                            )
+//                    )
+//                    );
+//                    JButton b = new JButton("more");
+//                    b.addActionListener((e) -> {
+//                        hiddenNameTable.getFrame().setVisible(true);
+//                    });
+//                    this.add(b, gbc);
+//                    entries.add(new Entry(tfile, nameFields, hiddenNameTable));
+//                    nameFields.clear();
+//                    break;
+//                }
+//                counter++;
+//            }
+//
+//            gbc.gridx = 0;
+//            gbc.gridy++;
+//        }
+        setSize(800, 300);
+//        setPreferredSize(getSize());
+        setVisible(true);
     }
 
-    public JPanel getPanel() {
-        return panel;
+    public List<Result> getFieldContent() {
+        List<Result> results = new ArrayList<>();
+        entries.forEach(entry -> {
+            String fileName = entry.fileField.getText();
+            ArrayList<String> names = new ArrayList<>();
+            entry.nameFields.forEach((nameField) -> {
+                names.add(nameField.getText());
+            });
+            if (entry.hiddenNamesExists()) {
+                names.addAll(entry.hiddenNamesTable.getNames());
+            }
+
+            results.add(new Result(fileName, names));
+        });
+
+        return results;
     }
 }

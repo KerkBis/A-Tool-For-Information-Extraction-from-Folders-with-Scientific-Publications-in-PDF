@@ -33,8 +33,8 @@ public class NameRecogniser {
     }
 
     public NameRecogniser() throws Exception {
-//        serializedClassifier = "classifiers/english.all.3class.distsim.crf.ser.gz";
-//        classifier = CRFClassifier.getClassifier(serializedClassifier);
+        serializedClassifier = "src/main/java/resources/english.all.3class.distsim.crf.ser.gz";
+        classifier = CRFClassifier.getClassifier(serializedClassifier);
     }
 
     public NameRecogniser(String inputText) throws Exception {
@@ -45,8 +45,8 @@ public class NameRecogniser {
     }
 
     public ArrayList<String> findNames() throws Exception {
-        return regexNer();
-//        return regexNerVerification(regexNer());//RegexNER -> StandfordNER verifycation -> output
+//        return regexNer();
+        return regexNerVerification(regexNer());//RegexNER -> StandfordNER verifycation -> output
         //return StandfordNer();
     }
 

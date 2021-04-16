@@ -6,6 +6,7 @@
 package application.View;
 
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,7 +25,7 @@ public class InfoPopUpTable {
     JTable nameTable;
     JButton ok;
 
-    public InfoPopUpTable(ArrayList<String> listOfNames) {
+    public InfoPopUpTable(List<String> listOfNames) {
         frame = new JFrame();
         frame.setTitle("Full list of Names");
         frame.setBounds(500, 250, 200, 450);
