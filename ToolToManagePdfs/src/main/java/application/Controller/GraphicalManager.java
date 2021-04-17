@@ -33,31 +33,19 @@ public class GraphicalManager {
         public void actionPerformed(ActionEvent e) {
             // Handle open button action.
             if (e.getSource() == open) {
-                int returnVal = fc.showOpenDialog(MenuGui.this);
 
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File[] files = fc.getSelectedFiles();
+            }
+            int returnVal = fc.showOpenDialog(MenuGui.this);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File[] files = fc.getSelectedFiles();
+                //This is where application begins proccesing the files.
+                App.fileProccesing(files);
 
-                    //This is where application begins proccesing the files.
-//                    String result =
-                    App.fileProccesing(files);
-//                                    .toString();
+                Manager.makeBackup();
+                displayInfoGui(Manager.getResults());
+                setVisible(false);
+                dispose();
 
-//                    log.append(result);
-                    // Manager.makeBackup();
-                    displayInfoGui(Manager.getResults());
-                    setVisible(false);
-                    dispose();
-
-//                    try {
-//                        log.setText(result);
-//                    } catch (Exception evt) {
-//                        log.append("failed to open csv file for editing");
-//                    }
-                } //else {
-//                    log.append("Open command cancelled by user.\n");
-//                }
-//                log.setCaretPosition(log.getDocument().getLength());
             }
 
         }
@@ -88,22 +76,14 @@ public class GraphicalManager {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == submit) {
+
                 int i = 0;
-//                for (InfoElements panel : ipanels) {
-//                    String fileName = panel.getFieldContent().get(0);
-//                    ArrayList<String> listOfNames = new ArrayList<>();
-//                    listOfNames.addAll(panel.getFieldContent().subList(1, panel.getFieldContent().size()));
-//                    Manager.modifyResults(new Result(fileName, listOfNames), i);
-//                    System.out.println();
-//                    i++;
-//                }
                 for (Result result : panel.getFieldContent()) {
                     Manager.modifyResults(result, i);
                     i++;
                 };
-                JFileChooser fc = new JFileChooser();
-                int returnVal = fc.showSaveDialog(InfoGui.this);
 
+                int returnVal = fc.showSaveDialog(InfoGui.this);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
                     Export.exportToCSV(Manager.getResults(), file);
@@ -112,7 +92,6 @@ public class GraphicalManager {
                 displayMenuGui();
                 setVisible(false);
                 dispose();
-
 
             } else if (e.getSource() == reset) {
                 dispose();

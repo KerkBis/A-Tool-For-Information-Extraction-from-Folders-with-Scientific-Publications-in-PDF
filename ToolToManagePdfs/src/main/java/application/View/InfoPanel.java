@@ -41,7 +41,7 @@ public class InfoPanel extends JPanel {
             if (names.size() > 2) {
                 this.nameFields.add(new JTextField(names.get(0)));
                 this.nameFields.add(new JTextField(names.get(1)));
-                this.hiddenNamesTable = new InfoPopUpTable(names.subList(1, names.size()));
+                this.hiddenNamesTable = new InfoPopUpTable(names.subList(2, names.size()));
             } else {
                 for (String name : names) {
                     this.nameFields.add(new JTextField(name));
@@ -66,6 +66,8 @@ public class InfoPanel extends JPanel {
         GridBagLayout layout = new GridBagLayout();
         this.setLayout(layout);
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 50;
+        //gbc.weighty = 25;
         gbc.gridx = 0;
         gbc.gridy = 0;
 
@@ -146,6 +148,7 @@ public class InfoPanel extends JPanel {
             String fileName = entry.fileField.getText();
             ArrayList<String> names = new ArrayList<>();
             entry.nameFields.forEach((nameField) -> {
+                if (!nameField.getText().equals(""))
                 names.add(nameField.getText());
             });
             if (entry.hiddenNamesExists()) {

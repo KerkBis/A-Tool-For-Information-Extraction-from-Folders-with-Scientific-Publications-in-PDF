@@ -5,6 +5,7 @@
  */
 package application.View;
 
+import edu.stanford.nlp.io.ExtensionFileFilter;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
@@ -14,10 +15,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
  * @author tamag
+ *
  */
 public abstract class Menu extends JFrame
         implements ActionListener {
@@ -25,6 +28,7 @@ public abstract class Menu extends JFrame
     // Components of the Form
     private JLabel title;
     public JFileChooser fc;
+
     public JTextArea log;
 
     public JButton open;
@@ -37,6 +41,8 @@ public abstract class Menu extends JFrame
         //dfferent modes
         fc.setMultiSelectionEnabled(true);
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        FileFilter pdfType = new ExtensionFileFilter("pdf", rootPaneCheckingEnabled);
+        fc.setFileFilter(pdfType);
         //fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         //fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     }

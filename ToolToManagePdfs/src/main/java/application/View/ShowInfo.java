@@ -5,6 +5,7 @@
  */
 package application.View;
 
+import edu.stanford.nlp.io.ExtensionFileFilter;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
@@ -16,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -38,7 +40,19 @@ abstract public class ShowInfo extends JFrame
     public JLabel name;
     public JTextField tname;
 
+    public void initFileChooser() {
+        //Create file chooser
+        fc = new JFileChooser();
+        FileFilter pdfType = new ExtensionFileFilter("csv", rootPaneCheckingEnabled);
+        fc.setFileFilter(pdfType);
+        //dfferent modes
+        //fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        //fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+    }
+
     public ShowInfo() {
+
+        initFileChooser();
 
         setTitle("PDF Name Finder");
         setBounds(300, 90, 900, 600);
