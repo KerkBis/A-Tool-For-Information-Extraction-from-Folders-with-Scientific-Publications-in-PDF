@@ -8,6 +8,8 @@ package application.Controller;
 import application.Model.DocumentEditor;
 import application.Model.NameRecogniser;
 import application.Model.Result;
+import edu.stanford.nlp.ie.AbstractSequenceClassifier;
+import edu.stanford.nlp.ling.CoreLabel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,6 +23,8 @@ import java.util.logging.Logger;
  */
 public class Manager {
 
+    String serializedClassifier;
+    AbstractSequenceClassifier<CoreLabel> classifier;
     static List<DocumentEditor> editors = new ArrayList<DocumentEditor>();
     static NameRecogniser nameRecogniser;
     private static List<Result> results = new ArrayList<Result>();
@@ -38,6 +42,11 @@ public class Manager {
         }
     }
 
+    static void LoadClassifier() throws Exception {
+        //initialise NER
+        nameRecogniser = new NameRecogniser();
+    }
+
     static int proccessing(File[] files) throws Exception {
 
         for (File file : files) {
@@ -49,8 +58,6 @@ public class Manager {
             products.add(p);
 
         }
-        //initialise NER
-        nameRecogniser = new NameRecogniser();
         for (DocumentProduct product : products) {
             //Analyse text with NER 
             nameRecogniser.setText(product.scannedText);
@@ -72,6 +79,7 @@ public class Manager {
     static void resetResults() {
         results = resultsBackUp;
     }
+
     static void modifyResults(Result element, int elementIndex) {
         results.set(elementIndex, element);
     }
