@@ -11,7 +11,7 @@ public class App {
     public static void main(String[] args) throws Exception {
 
         System.out.println(">>>PdfOrganiser v0.1<<<");
-        Manager.LoadClassifier();
+        Manager.LoadManager();
         Controller g = new Controller();
 //        g.displayMenuGui();
         Scanner keyboard = new Scanner(System.in);

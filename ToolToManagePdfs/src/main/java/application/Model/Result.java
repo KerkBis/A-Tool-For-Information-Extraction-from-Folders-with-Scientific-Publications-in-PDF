@@ -6,6 +6,7 @@
 package application.Model;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  *
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 public class Result {
 
     String fileName;
+    String title;
+    Calendar publicationDate;
     ArrayList<String> names;
 
     public Result(String fileName, ArrayList<String> names) {
@@ -21,8 +24,24 @@ public class Result {
         this.names = names;
     }
 
+    public Result(String fileName, String title, Calendar publicationDate, ArrayList<String> names) {
+        this.fileName = fileName;
+        this.title = title;
+        this.publicationDate = publicationDate;
+        this.names = names;
+
+    }
+
     public String getFileName() {
         return fileName;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Calendar getPublicationDate() {
+        return publicationDate;
     }
 
     public ArrayList<String> getNames() {

@@ -5,7 +5,7 @@
  */
 package application.Controller;
 
-import application.Model.Export;
+import application.Model.CSVeditor;
 import application.Model.Result;
 import application.View.InfoElements;
 import application.View.InfoPanel;
@@ -78,43 +78,18 @@ public class Controller {
                     System.out.println("unrecognised command");
                 }
             }
-            if (extraction && inputedFile && outputedFile) {
-                executeCommand(inFolder, outFile);
-            } else if (batchRename && inputedFile) {
-                List<String> ls = Export.readFromCSV(inFolder);
-
-                File parent = inFolder.getParentFile();
-                System.out.println("PFile: " + parent.getName());
-                FilenameFilter pdfFilefilter = (File dir, String name) -> {
-                    String lowercaseName = name.toLowerCase();
-                    if (lowercaseName.endsWith(".pdf")) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                };
-                File fileList[] = parent.listFiles(pdfFilefilter);
-                int i = 0;
-                for (File file : fileList) {
-
-                    File newName = new File(parent + "\\" + ls.get(i));
-                    System.out.println("Renaming: " + file.getName() + " to: " + newName.getName());
-                    if (file.renameTo(newName)) {
-                        System.out.println("renamed");
-                    } else {
-                        System.out.println("Error");
-                    }
-
-                    i++;
-                }
-
+            if (executeCommand(extraction, inputedFile, outputedFile, batchRename, inFolder, outFile) == 0) {
+                System.out.println("System Error execution of command failed...exiting");
+                return 0;
             }
 
         }
         return 1;
     }
 
-    static int executeCommand(File inFolder, File outFile) {
+    static int executeCommand(boolean extraction, boolean inputedFile, boolean outputedFile, boolean batchRename,
+            File inFolder, File outFile) {
+
         FilenameFilter pdfFilefilter = (File dir, String name) -> {
             String lowercaseName = name.toLowerCase();
             if (lowercaseName.endsWith(".pdf")) {
@@ -123,21 +98,44 @@ public class Controller {
                 return false;
             }
         };
-        File fileList[] = inFolder.listFiles(pdfFilefilter);
-        try {
-            Manager.proccessing(fileList);
-        } catch (Exception ex) {
-            System.out.println("File not found");
-            return 0;
+        if (extraction && inputedFile && outputedFile) {
+            File fileList[] = inFolder.listFiles(pdfFilefilter);
+            try {
+                Manager.proccessing(fileList);
+            } catch (Exception ex) {
+                System.out.println("File not found");
+                return 1;
+            }
+            System.out.println("pdfExtracted!!!");
+            CSVeditor.exportToCSVv2(Manager.getResults(), outFile);
+
+            return 1;
+
+        } else if (batchRename && inputedFile) {
+            List<String> ls = CSVeditor.readFromCSV(inFolder);
+
+            File parent = inFolder.getParentFile();
+            System.out.println("PFile: " + parent.getName());
+
+            File fileList[] = parent.listFiles(pdfFilefilter);
+            int i = 0;
+            for (File file : fileList) {
+
+                File newName = new File(parent + "\\" + ls.get(i));
+                System.out.println("Renaming: " + file.getName() + " to: " + newName.getName());
+                if (file.renameTo(newName)) {
+                    System.out.println("renamed");
+                } else {
+                    System.out.println("Error");
+                }
+                i++;
+            }
+            return 1;
         }
-        System.out.println("pdfExtracted!!!");
-
-        Export.exportToCSVv2(Manager.getResults(), outFile);
-
-        return 1;
+        return 0;
     }
 
-    static StringBuffer fileProccesing(File[] files) {
+    static StringBuffer handleProccessing(File[] files) {
 
         StringBuffer output = new StringBuffer();
         try {
@@ -147,7 +145,6 @@ public class Controller {
         } catch (Exception ex) {
             output.append("File not found");
         }
-
         return output;
     }
 
@@ -163,7 +160,7 @@ public class Controller {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File[] files = fc.getSelectedFiles();
                 //This is where application begins proccesing the files.
-                fileProccesing(files);
+                handleProccessing(files);
 
                 Manager.makeBackup();
                 displayInfoGui(Manager.getResults());
@@ -171,9 +168,7 @@ public class Controller {
                 dispose();
 
             }
-
         }
-
     }
 
     public class InfoGui extends ShowInfo {
@@ -210,7 +205,7 @@ public class Controller {
                 int returnVal = fc.showSaveDialog(InfoGui.this);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
-                    Export.exportToCSV(Manager.getResults(), file);
+                    CSVeditor.exportToCSV(Manager.getResults(), file);
                 }
                 Manager.closeAll();
                 displayMenuGui();

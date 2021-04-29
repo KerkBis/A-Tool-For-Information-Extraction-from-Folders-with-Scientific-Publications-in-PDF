@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author tamag
  */
-public class Export {
+public class CSVeditor {
 
     public static String exportToCSV(List<Result> results, File file) {
         // first create file object for file placed at location 
@@ -84,21 +84,25 @@ public class Export {
             CSVWriter writer = new CSVWriter(fw);
 
             // adding header to csv
-            String[] header = {"File", "Full Names"};
+            String[] header = {"File", "Title", "Publication Date", "Full Names"};
             writer.writeNext(header);
 
             // add data to csv
             for (Result result : results) {
 
                 String fileName = result.getFileName();
-                String[] tokens = result.getNames().toArray(new String[result.getNames().size()]);
-                int n = tokens.length;
-                String newArr[] = new String[n + 1];
-                newArr[0] = fileName;
+                String title = result.getTitle();
+                String date = result.getPublicationDate().getTime().toString();
+                String[] names = result.getNames().toArray(new String[result.getNames().size()]);
+                int n = names.length;
+                String[] csvEntry = new String[n + 3];
+                csvEntry[0] = fileName;
+                csvEntry[1] = title;
+                csvEntry[2] = date;
                 for (int i = 0; i < n; i++) {
-                    newArr[i + 1] = tokens[i];
+                    csvEntry[i + 3] = names[i];
                 }
-                writer.writeNext(newArr);
+                writer.writeNext(csvEntry);
             }
             System.out.println("Exported to directory: " + file.getPath());
             // closing writer connection

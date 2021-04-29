@@ -52,12 +52,14 @@ public class DocumentEditor {
 //      PDFTextStripper pdfStripper = new PDFTextStripper();
 //      this.scannedText = pdfStripper.getText(doc);
             this.scannedText = getFirstPageText();
+
         } catch (IOException ex) {
             Logger.getLogger(DocumentEditor.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         //extract the document properties
         PDDocumentInformation docInformation = doc.getDocumentInformation();
+
 
         this.author = docInformation.getAuthor();
         this.title = docInformation.getTitle();
@@ -74,7 +76,7 @@ public class DocumentEditor {
         PDDocument fd = new PDDocument();
         fd.addPage(this.doc.getPage(0));
         PDFTextStripper pdfStripper = new PDFTextStripper();
-
+        pdfStripper.getLineSeparator();
         fd.close();
         return pdfStripper.getText(fd);
 

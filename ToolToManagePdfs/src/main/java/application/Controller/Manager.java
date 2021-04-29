@@ -8,11 +8,13 @@ package application.Controller;
 import application.Model.DocumentEditor;
 import application.Model.NameRecogniser;
 import application.Model.Result;
+import application.Model.TitleRecogniser;
 import edu.stanford.nlp.ie.AbstractSequenceClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +29,7 @@ public class Manager {
     AbstractSequenceClassifier<CoreLabel> classifier;
     static List<DocumentEditor> editors = new ArrayList<DocumentEditor>();
     static NameRecogniser nameRecogniser;
+    static TitleRecogniser titleRecongniser;
     private static List<Result> results = new ArrayList<Result>();
     static List<Result> resultsBackUp;
     static List<DocumentProduct> products = new ArrayList<>();
@@ -34,17 +37,22 @@ public class Manager {
     static class DocumentProduct {
 
         String fileName;
+        String title;
+        Calendar publicationDate;
         String scannedText;
 
-        public DocumentProduct(String fileName, String scannedText) {
+        public DocumentProduct(String fileName, String title, Calendar publicationDate, String scannedText) {
             this.fileName = fileName;
+            this.title = title;
+            this.publicationDate = publicationDate;
             this.scannedText = scannedText;
         }
     }
 
-    static void LoadClassifier() throws Exception {
-        //initialise NER
+    static void LoadManager() throws Exception {
+        //initialise NER and TER(Title Entities Recogniser)
         nameRecogniser = new NameRecogniser();
+        titleRecongniser = new TitleRecogniser();
     }
 
     static int proccessing(File[] files) throws Exception {
@@ -53,8 +61,11 @@ public class Manager {
             System.out.println(">>>Making editor for file:" + file.getName() + "<<<");
             DocumentEditor docEditor = new DocumentEditor(file);
             editors.add(docEditor);
-            //make a list of scanned text and file names
-            DocumentProduct p = new DocumentProduct(docEditor.getFileName(), docEditor.getScannedText());
+
+            String fileTitle = titleRecongniser.findTitle(file);
+            //make a list of document products containing the document's fileName Title, creation date and scaned text
+            DocumentProduct p = new DocumentProduct(docEditor.getFileName(), fileTitle,
+                    docEditor.getCreationDate(), docEditor.getScannedText());
             products.add(p);
 
         }
@@ -65,14 +76,16 @@ public class Manager {
             //and create list of Results
             ArrayList<String> names = nameRecogniser.findNames();
             String fileName = product.fileName;
-            results.add(new Result(fileName, names));
+            String title = product.title;
+            Calendar publicationDate = product.publicationDate;
+            results.add(new Result(fileName, title, publicationDate, names));
         }
 
         return 0;
     }
 
     static void makeBackup() {
-        resultsBackUp = new ArrayList<Result>();
+        resultsBackUp = new ArrayList<>();
         resultsBackUp = results;
     }
 
