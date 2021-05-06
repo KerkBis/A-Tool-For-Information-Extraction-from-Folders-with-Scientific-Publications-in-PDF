@@ -112,6 +112,10 @@ public class Controller {
         if (extraction && inputedFile && outputedFile) {
             Manager.closeAll();
             File fileList[] = inFolder.listFiles(new PdfFileFilter());
+            if(fileList.length == 0){
+                System.out.println("folder has no pdf files");
+                return 1;
+            }
             handleProccessing(fileList);
             CSVeditor.exportToCSVv2(Manager.getResults(), outFile);
             return 1;
