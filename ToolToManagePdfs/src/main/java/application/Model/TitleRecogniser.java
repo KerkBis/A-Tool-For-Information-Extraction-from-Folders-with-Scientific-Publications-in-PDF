@@ -121,7 +121,7 @@ public class TitleRecogniser extends PDFTextStripper {
         }
         int numberOfLines = 1;
         for (LineInfo il : lines) {
-            if (il.fontSize == maxFontSize && numberOfLines <= 2) {
+            if (il.fontSize == maxFontSize && numberOfLines <= 3) {
                 bigWords.add(il.text);
                 numberOfLines++;
             }

@@ -50,50 +50,10 @@ public class NameRecogniser {
 
     public ArrayList<String> findNames() throws Exception {
 //        return regexNer();
-        // return regexNerVerification(regexNer());//RegexNER -> StandfordNER verifycation -> output
-//        return StandfordNer();
-        return StandfordNerv2();
+        return StandfordNer();
     }
 
-    public ArrayList<String> StandfordNer() {
-        ArrayList<String> output = new ArrayList<String>();
-        // set up pipeline properties
-        Properties props = new Properties();
-        // set the list of annotators to run
-        props.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner");
-        // set a property for an annotator, in this case the coref annotator is being set to use the neural algorithm
-        props.setProperty("coref.algorithm", "neural");
-        // build pipeline
-        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-        // create a document object
-        CoreDocument document = new CoreDocument(this.text);
-        // annnotate the document
-        pipeline.annotate(document);
-
-        // view results
-        System.out.println("---");
-        System.out.println("entities found");
-        for (CoreEntityMention em : document.entityMentions()) {
-            if (em.entityType().equals("PERSON")) {
-                output.add(em.text());
-            }
-        }
-
-//        Sentence sent = new Sentence(this.text);
-//        List<String> nerTags = sent.nerTags();  // [PERSON, O, O, O, O, O, O, O]
-//        String firstPOSTag = sent.posTag(0);   // NNP
-//        sent.asCoreMap(functions)
-//        int i = -0;
-//        for (String itterator : nerTags) {
-//            if (itterator.equals("PERSON")) {
-//                output.add(sent.word(i));
-//            }
-//            i++;
-//        }
-        return output;
-    }
-
-    public ArrayList<String> StandfordNerv2() throws Exception {
+    public ArrayList<String> StandfordNer() throws Exception {
         ArrayList<String> output = new ArrayList<String>();
 
 //        for (String pname : regexDetectedNames) {
@@ -109,9 +69,11 @@ public class NameRecogniser {
 
         String[] lines = output.toArray(new String[output.size()]);
         output.clear();
-        int j = 0;
+
         for (String str : lines) {
-            j++;
+
+            //calssifier takes the str and produces a Triple containg it's classificantion in String 
+            //allong with it's coordinates on the line
             List<Triple<String, Integer, Integer>> triples = classifier.classifyToCharacterOffsets(str);
             for (Triple<String, Integer, Integer> trip : triples) {
                 // System.out.printf("%s over character offsets [%d, %d) in sentence %d.%n",
@@ -122,20 +84,7 @@ public class NameRecogniser {
                 }
             }
         }
-//
-//        for (String str : lines) {
-//            String name = classifier.classifyWithInlineXML(str);
-//            System.out.println("-----");
-//            System.out.println(name);
-//            System.out.println("-----");
 
-//            name.r
-//            if (name.contains("/PERSON") && !name.contains("/LOCATION") && !name.contains("/ORGANISATION")) {
-//                name = name.replace("/PERSON", "");
-//                name = name.replace("/O", "");
-//                output.add(name);
-//            }
-//        }
         //discard duplicate Names
         List<String> original = output;
         List<String> result = new ArrayList<>();
@@ -167,11 +116,26 @@ public class NameRecogniser {
             output.add(matcher.group());
             found = true;
         }
-
         if (!found) {
             System.out.println("No match found.");
         }
+        return output;
+    }
 
+    public String regexDate() {
+
+        String output = new String();
+        var p = Pattern.compile("[0-9]{2}/[0-9]{2}/[0-9]{4}");
+        Matcher matcher = p.matcher(this.text);
+        boolean found = false;
+
+        if (matcher.find()) {
+            output = matcher.group();
+            found = true;
+        }
+        if (!found) {
+            System.out.println("No match found.");
+        }
         return output;
     }
 

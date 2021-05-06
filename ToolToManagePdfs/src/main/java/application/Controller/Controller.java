@@ -29,6 +29,20 @@ public class Controller {
     MenuGui m;
     InfoGui i;
 
+    static class PdfFileFilter implements FilenameFilter {
+
+        @Override
+        public boolean accept(File dir, String name) {
+            String lowercaseName = name.toLowerCase();
+            if (lowercaseName.endsWith(".pdf")) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+    }
+
     static int commandHandler(Scanner keyboard) {
 
         String currentDirectory = System.getProperty("user.dir");
@@ -41,6 +55,7 @@ public class Controller {
         boolean inputedFile;
         boolean outputedFile;
         boolean batchRename;
+        boolean unrecognisedCmd;
         File inFolder = null;
         File outFile = null;
 
@@ -50,6 +65,7 @@ public class Controller {
             inputedFile = false;
             outputedFile = false;
             batchRename = false;
+            unrecognisedCmd = false;
 
             inputLine = keyboard.nextLine();
             tokens = inputLine.split(" -");
@@ -75,10 +91,12 @@ public class Controller {
                     System.out.println("System exiting");
                     return 1;
                 } else {
+                    unrecognisedCmd = true;
                     System.out.println("unrecognised command");
                 }
             }
-            if (executeCommand(extraction, inputedFile, outputedFile, batchRename, inFolder, outFile) == 0) {
+            if (executeCommand(extraction, inputedFile, outputedFile, batchRename,
+                    unrecognisedCmd, inFolder, outFile) == 0) {
                 System.out.println("System Error execution of command failed...exiting");
                 return 0;
             }
@@ -87,49 +105,20 @@ public class Controller {
         return 1;
     }
 
-    static int executeCommand(boolean extraction, boolean inputedFile, boolean outputedFile, boolean batchRename,
+    static int executeCommand(boolean extraction, boolean inputedFile, boolean outputedFile,
+            boolean batchRename, boolean unrecognisedCmd,
             File inFolder, File outFile) {
 
-        FilenameFilter pdfFilefilter = (File dir, String name) -> {
-            String lowercaseName = name.toLowerCase();
-            if (lowercaseName.endsWith(".pdf")) {
-                return true;
-            } else {
-                return false;
-            }
-        };
         if (extraction && inputedFile && outputedFile) {
-            File fileList[] = inFolder.listFiles(pdfFilefilter);
-            try {
-                Manager.proccessing(fileList);
-            } catch (Exception ex) {
-                System.out.println("File not found");
-                return 1;
-            }
-            System.out.println("pdfExtracted!!!");
+            Manager.closeAll();
+            File fileList[] = inFolder.listFiles(new PdfFileFilter());
+            handleProccessing(fileList);
             CSVeditor.exportToCSVv2(Manager.getResults(), outFile);
-
             return 1;
-
         } else if (batchRename && inputedFile) {
-            List<String> ls = CSVeditor.readFromCSV(inFolder);
-
-            File parent = inFolder.getParentFile();
-            System.out.println("PFile: " + parent.getName());
-
-            File fileList[] = parent.listFiles(pdfFilefilter);
-            int i = 0;
-            for (File file : fileList) {
-
-                File newName = new File(parent + "\\" + ls.get(i));
-                System.out.println("Renaming: " + file.getName() + " to: " + newName.getName());
-                if (file.renameTo(newName)) {
-                    System.out.println("renamed");
-                } else {
-                    System.out.println("Error");
-                }
-                i++;
-            }
+            handleBatchRename(inFolder);
+            return 1;
+        } else if (unrecognisedCmd) {
             return 1;
         }
         return 0;
@@ -145,7 +134,41 @@ public class Controller {
         } catch (Exception ex) {
             output.append("File not found");
         }
+        System.out.println("pdfExtracted!!!");
         return output;
+    }
+
+    static void handleBatchRename(File inFile) {
+
+        List<String> listOfInfo;
+        try {
+            Manager.closeAll();
+            listOfInfo = CSVeditor.readFromCSV(inFile);
+            File parent = inFile.getParentFile();
+
+            File fileList[] = parent.listFiles(new PdfFileFilter());
+
+            int index = 0;
+            for (File file : fileList) {
+                String oldName = file.getName();
+                String newName = listOfInfo.get(index); // first entry of csv line containing the file name
+                String pathName = parent + "\\" + newName;
+
+                File newFileName = new File(pathName);
+
+                if (!oldName.equals(newName)) {
+
+                    if (file.renameTo(newFileName)) {
+                        System.out.println("Renaming: " + file.getName() + " to: " + newFileName.getName());
+                    } else {
+                        System.out.println("Renaming failed");
+                    }
+                }
+                index++;
+            }
+        } catch (Exception ex) {
+            System.out.println("Read csv file failed, please provide a valid csv file");
+        }
     }
 
     public class MenuGui extends Menu {

@@ -71,7 +71,7 @@ public class CSVeditor {
     public static String exportToCSVv2(List<Result> results, File file) {
         // first create file object for file placed at location
         // specified by filepath
-        String s = "Not initialised";
+        String output = "Not initialised";
         //File file = new File(System.getProperty("user.dir") + "csv");
         try {
             // create FileWriter object with file as parameter
@@ -107,34 +107,32 @@ public class CSVeditor {
             System.out.println("Exported to directory: " + file.getPath());
             // closing writer connection
 
+            output = sw.toString();
+
             writer.close();
-            s = sw.toString();
             sw.close();
             fw.close();
+
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             System.out.println("Failed to export in csv");
         }
-        return s;
+        return output;
     }
 
-    public static List<String> readFromCSV(File file) {
+    public static List<String> readFromCSV(File file) throws Exception {
         CSVReader reader = null;
         List<String> output = new ArrayList<>();
-        try {
-            //parsing a CSV file into CSVReader class constructor
-            reader = new CSVReader(new FileReader(file + ".csv"));
-            String[] nextLine;
-            //reads one line at a time
-            System.out.println("Mult: " + reader.getMultilineLimit());
-            while ((nextLine = reader.readNext()) != null) {
-                System.out.println(nextLine[0]);
-                output.add(nextLine[0]);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        //parsing a CSV file into CSVReader class constructor
+        reader = new CSVReader(new FileReader(file + ".csv"));
+        String[] nextLine;
+        //reads one line at a time  
+        while ((nextLine = reader.readNext()) != null) {
+            //System.out.println(nextLine[0]);
+            output.add(nextLine[0]);
         }
-        output.remove(0);
+        output.remove(0);//the first line containing the csv headers
+        reader.close();
         return output;
     }
 }
