@@ -122,21 +122,5 @@ public class NameRecogniser {
         return output;
     }
 
-    public String regexDate() {
-
-        String output = new String();
-        var p = Pattern.compile("[0-9]{2}/[0-9]{2}/[0-9]{4}");
-        Matcher matcher = p.matcher(this.text);
-        boolean found = false;
-
-        if (matcher.find()) {
-            output = matcher.group();
-            found = true;
-        }
-        if (!found) {
-            System.out.println("No match found.");
-        }
-        return output;
-    }
 
 }

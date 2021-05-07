@@ -60,7 +60,6 @@ public class DocumentEditor {
         //extract the document properties
         PDDocumentInformation docInformation = doc.getDocumentInformation();
 
-
         this.author = docInformation.getAuthor();
         this.title = docInformation.getTitle();
         this.creator = docInformation.getCreator();
@@ -68,8 +67,11 @@ public class DocumentEditor {
         this.creationDate = docInformation.getCreationDate();
         this.modifiedDate = docInformation.getModificationDate();
         this.keywords = docInformation.getKeywords();
+
         System.out.println(">>>Read file " + this.path + "<<<");
     }
+
+  
 
     private String getFirstPageText() throws IOException {
 

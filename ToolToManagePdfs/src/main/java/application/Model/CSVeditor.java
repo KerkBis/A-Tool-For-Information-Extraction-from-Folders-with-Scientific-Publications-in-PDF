@@ -93,6 +93,7 @@ public class CSVeditor {
                 String fileName = result.getFileName();
                 String title = result.getTitle();
                 String date = result.getPublicationDate().getTime().toString();
+                //String date = result.getPublicationDate();
                 String[] names = result.getNames().toArray(new String[result.getNames().size()]);
                 int n = names.length;
                 String[] csvEntry = new String[n + 3];
