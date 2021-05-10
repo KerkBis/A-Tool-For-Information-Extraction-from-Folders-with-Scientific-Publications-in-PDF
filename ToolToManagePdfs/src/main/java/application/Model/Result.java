@@ -16,7 +16,7 @@ public class Result {
 
     String fileName;
     String title;
-    Calendar publicationDate;
+    String publicationDate;
     ArrayList<String> names;
 
     public Result(String fileName, ArrayList<String> names) {
@@ -24,7 +24,7 @@ public class Result {
         this.names = names;
     }
 
-    public Result(String fileName, String title, Calendar publicationDate, ArrayList<String> names) {
+    public Result(String fileName, String title, String publicationDate, ArrayList<String> names) {
         this.fileName = fileName;
         this.title = title;
         this.publicationDate = publicationDate;
@@ -40,7 +40,7 @@ public class Result {
         return title;
     }
 
-    public Calendar getPublicationDate() {
+    public String getPublicationDate() {
         return publicationDate;
     }
 

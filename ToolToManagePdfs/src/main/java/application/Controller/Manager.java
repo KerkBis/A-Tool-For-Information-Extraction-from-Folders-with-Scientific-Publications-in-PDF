@@ -17,7 +17,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,18 +41,18 @@ public class Manager {
 
         String fileName;
         String title;
-        Calendar publicationDate;
+        String publicationDate;
         String scannedText;
         String author;
 
-        public DocumentProduct(String fileName, String title, Calendar publicationDate, String scannedText) {
+        public DocumentProduct(String fileName, String title, String publicationDate, String scannedText) {
             this.fileName = fileName;
             this.title = title;
             this.publicationDate = publicationDate;
             this.scannedText = scannedText;
         }
 
-        public DocumentProduct(String fileName, String title, Calendar publicationDate, String scannedText, String author) {
+        public DocumentProduct(String fileName, String title, String publicationDate, String scannedText, String author) {
             this.fileName = fileName;
             this.title = title;
             this.publicationDate = publicationDate;
@@ -71,6 +70,7 @@ public class Manager {
     static int proccessing(File[] files) throws Exception {
 //        File f = new File(files[0].getPath() + "scandText.txt");
 //        FileWriter fw = new FileWriter(f);
+
         for (File file : files) {
 
             System.out.println(">>>Making editor for file:" + file.getName() + "<<<");
@@ -79,43 +79,39 @@ public class Manager {
 //            fw.append("\n" + "--------------------------------------------------------------------" + " \n");
             editors.add(docEditor);
 
-//            String fileTitle = TitleRecogniser.findTitle(file);
-//            dateRecogniser.setText(docEditor.getScannedText());
-//            String date = dateRecogniser.findDate();
-            //check if metadata title is set and if not extract info from the file's content
-
-            String title = docEditor.getTitle();
+            //save the file's properties
             String author = docEditor.getAuthor();
+            //check if title property of file exists and if not extract it from content
+            String title = docEditor.getTitle();
             if (title == null) {
-//                System.out.println("Titlte blank");
                 title = TitleRecogniser.findTitle(file);
             }
-
-            //make a list of document products containing the document's fileName Title, creation date and scaned text and author
-            DocumentProduct p = new DocumentProduct(docEditor.getFileName(), title,
-                    docEditor.getCreationDate(), docEditor.getScannedText(), author);
-
-            products.add(p);
-
-        }
-        for (DocumentProduct product : products) {
-            //Analyse text with NER 
-            nameRecogniser.setText(product.scannedText);
-            nameRecogniser.findNames();
-            //and create list of Results
-            ArrayList<String> names = nameRecogniser.findNames();
-            String fileName = product.fileName;
-            String title = product.title;
-            Calendar publicationDate = product.publicationDate;
-            String author = product.author;
-            if (author != null) {
-                names.add(author);
+            dateRecogniser.setText(docEditor.getScannedText()); //
+            String date = dateRecogniser.findDate().toString();
+            if (date.equals("[]")) {//if date is an empty converted array to string
+                date = docEditor.getCreationDate().getTime().toString();//get creattion
+                System.out.println("Creation Date:" + date);
             }
 
-            results.add(new Result(fileName, title, publicationDate, names));
+            generateResults(docEditor.getScannedText(), docEditor.getFileName(), 
+                    title, date, author);
         }
+
 //        fw.close();
         return 0;
+    }
+
+    public static void generateResults(String scannedText, String fileName, 
+            String title, String publicationDate, String author ) throws Exception {
+        //Analyse text with NER 
+        nameRecogniser.setText(scannedText);
+        nameRecogniser.findNames();
+        //and create list of Results
+        ArrayList<String> names = nameRecogniser.findNames();
+        if (author != null) {
+            names.add(author);
+        }
+        results.add(new Result(fileName, title, publicationDate, names));
     }
 
     static void makeBackup() {
@@ -170,7 +166,6 @@ public class Manager {
             }
         });
         editors.clear();
-        products.clear();
         results.clear();
 
         return 0;

@@ -24,7 +24,7 @@ import javax.swing.JScrollPane;
  *
  * @author tamag
  */
-public class Controller {
+public class ControllerOld {
 
     MenuGui m;
     InfoGui i;
@@ -82,7 +82,7 @@ public class Controller {
 //                    break;
                 } else if (s.contains("of")) {
                     String filename = s.replaceAll("of ", "");
-                    outFile = new File(filename);
+                    outFile = new File(inFolder, filename);
                     outputedFile = true;
 //                    break;
                 } else if (s.contains("pdfBatchRename")) {
@@ -111,40 +111,20 @@ public class Controller {
 
         if (extraction && inputedFile && outputedFile) {
             Manager.closeAll();
-            try {
-                File fileList[] = inFolder.listFiles(new PdfFileFilter());
-                if (fileList.length == 0) {
-                    System.out.println("folder has no pdf files");
-                    return 1;
-                }
-                handleProccessing(fileList);
-               
-                CSVeditor.exportToCSVv2(Manager.getResults(), outFile);
-            } catch (NullPointerException ne) {
-                System.out.println("File not found");
-            }
+            File fileList[] = inFolder.listFiles(new PdfFileFilter());
+            handleProccessing(fileList);
+            CSVeditor.exportToCSVv2(Manager.getResults(), outFile);
             return 1;
-
-        } else if (batchRename && inputedFile && outputedFile) {
-            try {
-                if (outFile.isDirectory()) {
-                    handleBatchRename(inFolder, outFile);
-                } else {
-                    System.out.println("Folder is not a directory");
-                }
-                return 1;
-            } catch (NullPointerException ne) {
-                System.out.println("File not found");
-            }
-
+        } else if (batchRename && inputedFile) {
+            handleBatchRename(inFolder);
+            return 1;
         } else if (unrecognisedCmd) {
             return 1;
         }
-
         return 0;
     }
 
-    static int handleProccessing(File[] files) {
+    static StringBuffer handleProccessing(File[] files) {
 
         StringBuffer output = new StringBuffer();
         try {
@@ -152,38 +132,34 @@ public class Controller {
             output.append(Manager.printResults());
 //            output.append(Manager.printName());
         } catch (Exception ex) {
-            System.out.println("File not found");
+            output.append("File not found");
         }
         System.out.println("pdfExtracted!!!");
-        return 1;
+        return output;
     }
 
-    static int handleBatchRename(File inFile, File outFile) {
+    static void handleBatchRename(File inFile) {
 
-        List<String> changedFileNames;
+        List<String> listOfInfo;
         try {
             Manager.closeAll();
-            changedFileNames = CSVeditor.readFirstElemFromCSV(inFile);
-            
-            File fileList[] = outFile.listFiles(new PdfFileFilter());
+            listOfInfo = CSVeditor.readFirstElemFromCSV(inFile);
+            File parent = inFile.getParentFile();
 
-            if (fileList.length != changedFileNames.size()) {
-                System.out.println("BatchRename can not be applied to this folder");
-                return 1;
-            }
+            File fileList[] = parent.listFiles(new PdfFileFilter());
 
             int index = 0;
             for (File file : fileList) {
                 String oldName = file.getName();
-                String newName = changedFileNames.get(index); // first entry of csv line containing the file name
-                String pathName = outFile + "\\" + newName;
-                
+                String newName = listOfInfo.get(index); // first entry of csv line containing the file name
+                String pathName = parent + "\\" + newName;
+
                 File newFileName = new File(pathName);
 
                 if (!oldName.equals(newName)) {
-                    System.out.println("trying to rename: " + file.getName() + " to: " + newFileName.getName());
+
                     if (file.renameTo(newFileName)) {
-                        System.out.println("Rename Success");
+                        System.out.println("Renaming: " + file.getName() + " to: " + newFileName.getName());
                     } else {
                         System.out.println("Renaming failed");
                     }
@@ -191,11 +167,8 @@ public class Controller {
                 index++;
             }
         } catch (Exception ex) {
-            System.out.println("Read csv file failed, invalid csv file or target folder ");
+            System.out.println("Read csv file failed, please provide a valid csv file");
         }
-
-        return 1;
-
     }
 
     public class MenuGui extends Menu {

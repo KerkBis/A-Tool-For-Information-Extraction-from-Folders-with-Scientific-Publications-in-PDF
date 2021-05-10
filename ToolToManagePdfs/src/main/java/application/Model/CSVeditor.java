@@ -92,7 +92,7 @@ public class CSVeditor {
 
                 String fileName = result.getFileName();
                 String title = result.getTitle();
-                String date = result.getPublicationDate().getTime().toString();
+                String date = result.getPublicationDate();
                 //String date = result.getPublicationDate();
                 String[] names = result.getNames().toArray(new String[result.getNames().size()]);
                 int n = names.length;
@@ -120,7 +120,7 @@ public class CSVeditor {
         return output;
     }
 
-    public static List<String> readFromCSV(File file) throws Exception {
+    public static List<String> readFirstElemFromCSV(File file) throws Exception {
         CSVReader reader = null;
         List<String> output = new ArrayList<>();
 

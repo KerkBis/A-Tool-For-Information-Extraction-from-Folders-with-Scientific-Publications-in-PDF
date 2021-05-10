@@ -82,6 +82,7 @@ public class TitleRecogniser extends PDFTextStripper {
 
             Writer dummy = new OutputStreamWriter(new ByteArrayOutputStream());
             stripper.writeText(pdd, dummy);
+            dummy.close();
 
         } catch (IOException e) {
             // throw error
@@ -131,7 +132,7 @@ public class TitleRecogniser extends PDFTextStripper {
         for (String word : bigWords) {
             output = output.concat(word);
         }
-
+        fis.close();
         bigWords.clear();
         lines.clear();
         return output;
