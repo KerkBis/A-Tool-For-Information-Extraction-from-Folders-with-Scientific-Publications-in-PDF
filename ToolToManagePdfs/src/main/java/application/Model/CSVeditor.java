@@ -36,7 +36,7 @@ public class CSVeditor {
             CSVWriter writer = new CSVWriter(fw);
 
             // adding header to csv 
-            String[] header = {"File", "First Name", "Last Name"};
+            String[] header = {"File", "First Name", "Last Name", };
             writer.writeNext(header);
 
             // add data to csv
@@ -84,7 +84,7 @@ public class CSVeditor {
             CSVWriter writer = new CSVWriter(fw);
 
             // adding header to csv
-            String[] header = {"File", "Title", "Publication Date", "Full Names"};
+            String[] header = {"File", "Title", "Publication Date", "Full Names", "Proposed Name"};
             writer.writeNext(header);
 
             // add data to csv
@@ -96,13 +96,14 @@ public class CSVeditor {
                 //String date = result.getPublicationDate();
                 String[] names = result.getNames().toArray(new String[result.getNames().size()]);
                 int n = names.length;
-                String[] csvEntry = new String[n + 3];
+                String[] csvEntry = new String[n + 4];
                 csvEntry[0] = fileName;
                 csvEntry[1] = title;
                 csvEntry[2] = date;
                 for (int i = 0; i < n; i++) {
                     csvEntry[i + 3] = names[i];
                 }
+                csvEntry[n+3] = result.getProposedName();
                 writer.writeNext(csvEntry);
             }
             System.out.println("Exported to directory: " + file.getPath());

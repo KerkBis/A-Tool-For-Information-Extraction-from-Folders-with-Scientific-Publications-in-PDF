@@ -18,17 +18,19 @@ public class Result {
     String title;
     String publicationDate;
     ArrayList<String> names;
+    String proposedName;
 
     public Result(String fileName, ArrayList<String> names) {
         this.fileName = fileName;
         this.names = names;
     }
 
-    public Result(String fileName, String title, String publicationDate, ArrayList<String> names) {
+    public Result(String fileName, String title, String publicationDate, ArrayList<String> names, String proposedName) {
         this.fileName = fileName;
         this.title = title;
         this.publicationDate = publicationDate;
         this.names = names;
+        this.proposedName = proposedName;
 
     }
 
@@ -47,4 +49,10 @@ public class Result {
     public ArrayList<String> getNames() {
         return names;
     }
+
+    public String getProposedName() {
+        return proposedName;
+    }
+    
+    
 }

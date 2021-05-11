@@ -35,34 +35,11 @@ public class Manager {
     static DateRecogniser dateRecogniser;
     private static List<Result> results = new ArrayList<Result>();
     static List<Result> resultsBackUp;
-    static List<DocumentProduct> products = new ArrayList<>();
-
-    static class DocumentProduct {
-
-        String fileName;
-        String title;
-        String publicationDate;
-        String scannedText;
-        String author;
-
-        public DocumentProduct(String fileName, String title, String publicationDate, String scannedText) {
-            this.fileName = fileName;
-            this.title = title;
-            this.publicationDate = publicationDate;
-            this.scannedText = scannedText;
-        }
-
-        public DocumentProduct(String fileName, String title, String publicationDate, String scannedText, String author) {
-            this.fileName = fileName;
-            this.title = title;
-            this.publicationDate = publicationDate;
-            this.scannedText = scannedText;
-            this.author = author;
-        }
-    }
+       
 
     static void LoadManager() throws Exception {
         //initialise NER and TER(Title Entities Recogniser)
+        System.out.println("Loading please wait");
         nameRecogniser = new NameRecogniser();
         dateRecogniser = new DateRecogniser();
     }
@@ -86,15 +63,18 @@ public class Manager {
             if (title == null) {
                 title = TitleRecogniser.findTitle(file);
             }
-            dateRecogniser.setText(docEditor.getScannedText()); //
-            String date = dateRecogniser.findDate().toString();
-            if (date.equals("[]")) {//if date is an empty converted array to string
+            dateRecogniser.setText(docEditor.getScannedText()); 
+            String date = dateRecogniser.findDate().toString();//array to string will return [date1,date2,date3]
+            date = date.replaceAll("\\[", "");
+            date = date.replaceAll("\\]", "");
+            if (date.equals("")) {//if date is an empty converted array to string
                 date = docEditor.getCreationDate().getTime().toString();//get creattion
                 System.out.println("Creation Date:" + date);
-            }
-
+            }  
+            String proposedName = date +" "+ title;
+            
             generateResults(docEditor.getScannedText(), docEditor.getFileName(), 
-                    title, date, author);
+                    title, date, author, proposedName);
         }
 
 //        fw.close();
@@ -102,7 +82,7 @@ public class Manager {
     }
 
     public static void generateResults(String scannedText, String fileName, 
-            String title, String publicationDate, String author ) throws Exception {
+            String title, String publicationDate, String author, String proposedName) throws Exception {
         //Analyse text with NER 
         nameRecogniser.setText(scannedText);
         nameRecogniser.findNames();
@@ -111,7 +91,7 @@ public class Manager {
         if (author != null) {
             names.add(author);
         }
-        results.add(new Result(fileName, title, publicationDate, names));
+        results.add(new Result(fileName, title, publicationDate, names, proposedName));
     }
 
     static void makeBackup() {
