@@ -13,9 +13,9 @@ public class App {
         System.out.println(">>>PdfOrganiser v0.1<<<");
         Manager.LoadManager();
         Controller g = new Controller();
-//        g.displayMenuGui();
-        Scanner keyboard = new Scanner(System.in);
-        g.commandHandler(keyboard);
+        g.displayMenuGui();
+//        Scanner keyboard = new Scanner(System.in);
+//        g.commandHandler(keyboard);
 
     }
 

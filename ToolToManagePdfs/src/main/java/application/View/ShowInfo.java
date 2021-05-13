@@ -74,9 +74,9 @@ abstract public class ShowInfo extends JFrame
 //        panel.setSize(300, 50);
 //        this.add(panel);
 
-        back = new JButton(new ImageIcon("src\\main\\java\\resources\\back.png"));
+        back = new JButton("go back");
         back.setFont(new Font("Arial", Font.PLAIN, 15));
-        back.setSize(46, 33);
+        back.setSize(40, 30);
         back.setLocation(50, 10);
         back.addActionListener(this);
         this.add(back);

@@ -42,7 +42,6 @@ public class InfoElements {
         panel = new JPanel();
         panel.setBackground(Color.lightGray);
 
-
         fileLabel = new JLabel("File");
         fileLabel.setFont(new Font("Arial", Font.PLAIN, 20));
         //fileLabel.setSize(100, 20);

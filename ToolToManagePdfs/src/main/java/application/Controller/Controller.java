@@ -11,14 +11,19 @@ import application.View.InfoElements;
 import application.View.InfoPanel;
 import application.View.Menu;
 import application.View.ShowInfo;
+import edu.stanford.nlp.io.ExtensionFileFilter;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -118,7 +123,7 @@ public class Controller {
                     return 1;
                 }
                 handleProccessing(fileList);
-               
+
                 CSVeditor.exportToCSVv2(Manager.getResults(), outFile);
             } catch (NullPointerException ne) {
                 System.out.println("File not found");
@@ -164,7 +169,7 @@ public class Controller {
         try {
             Manager.closeAll();
             changedFileNames = CSVeditor.readFirstElemFromCSV(inFile);
-            
+
             File fileList[] = outFile.listFiles(new PdfFileFilter());
 
             if (fileList.length != changedFileNames.size()) {
@@ -177,7 +182,7 @@ public class Controller {
                 String oldName = file.getName();
                 String newName = changedFileNames.get(index); // first entry of csv line containing the file name
                 String pathName = outFile + "\\" + newName;
-                
+
                 File newFileName = new File(pathName);
 
                 if (!oldName.equals(newName)) {
@@ -203,19 +208,48 @@ public class Controller {
         @Override
         public void actionPerformed(ActionEvent e) {
             // Handle open button action.
+            int returnVal;
             if (e.getSource() == open) {
+                returnVal = fc.showOpenDialog(MenuGui.this);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File[] files = fc.getSelectedFiles();
+                    //This is where application begins proccesing the files.
+                    if (files.length == 1) {
+                        File directory = files[0];
+                        files = directory.listFiles(new PdfFileFilter());
+                        if (files.length == 0) {
+                            JOptionPane.showMessageDialog(null, "folder has no pdf files");
+                        }
+                    }
+                    handleProccessing(files);
+                    Manager.makeBackup();
+                    displayInfoGui(Manager.getResults());
+                    setVisible(false);
+                    dispose();
+                }
+            } else if (e.getSource() == batchRename) {
 
-            }
-            int returnVal = fc.showOpenDialog(MenuGui.this);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                File[] files = fc.getSelectedFiles();
-                //This is where application begins proccesing the files.
-                handleProccessing(files);
+                fc.setMultiSelectionEnabled(false);
+                fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                FileFilter csvType = new ExtensionFileFilter("csv", rootPaneCheckingEnabled);
+                fc.setFileFilter(csvType);
+                fc.setAcceptAllFileFilterUsed(false);
 
-                Manager.makeBackup();
-                displayInfoGui(Manager.getResults());
-                setVisible(false);
-                dispose();
+                returnVal = fc.showOpenDialog(MenuGui.this);
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    File inFile = fc.getSelectedFile();
+
+                    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                    returnVal = fc.showOpenDialog(MenuGui.this);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        File outFile = fc.getSelectedFile();
+                        if (outFile.isDirectory()) {
+                            handleBatchRename(inFile, outFile);
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Folder is not a directory");
+                        }
+                    }
+                }
 
             }
         }
@@ -224,10 +258,18 @@ public class Controller {
     public class InfoGui extends ShowInfo {
 
         public List<InfoElements> ipanels = new ArrayList<>();
+        JButton batchRename;
         JScrollPane jScrollPane1;
         InfoPanel panel;
 
         public InfoGui(List<Result> results) {
+
+            batchRename = new JButton("automatic raname");
+            batchRename.setFont(new Font("Arial", Font.PLAIN, 15));
+            batchRename.setSize(40, 30);
+            batchRename.setLocation(50, 10);
+            batchRename.addActionListener(this);
+            this.add(batchRename);
 
             jScrollPane1 = new JScrollPane();
             jScrollPane1.setSize(800, 300);
@@ -271,7 +313,6 @@ public class Controller {
                 displayMenuGui();
                 setVisible(false);
                 dispose();
-
             }
         }
     }

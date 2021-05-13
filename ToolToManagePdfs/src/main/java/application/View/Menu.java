@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -32,6 +33,7 @@ public abstract class Menu extends JFrame
     public JTextArea log;
 
     public JButton open;
+    public JButton batchRename;
 
     // constructor, to initialize the components
     // with default values.
@@ -40,9 +42,12 @@ public abstract class Menu extends JFrame
         fc = new JFileChooser();
         //dfferent modes
         fc.setMultiSelectionEnabled(true);
-        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         FileFilter pdfType = new ExtensionFileFilter("pdf", rootPaneCheckingEnabled);
         fc.setFileFilter(pdfType);
+        fc.setAcceptAllFileFilterUsed(false);
+
+        //---> fc.addChoosableFileFilter(new FileNameExtensionFilter("*.pdf", "pdf"));
         //fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         //fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     }
@@ -70,15 +75,14 @@ public abstract class Menu extends JFrame
         open.addActionListener(this);
         add(open);
 
-        //Create the log first, because the action listeners
-        //need to refer to it.
-        log = new JTextArea();
-        log.setFont(new Font("Arial", Font.PLAIN, 15));
-        log.setSize(300, 400);
-        log.setLocation(300, 100);
-        log.setLineWrap(true);
-        add(log);
+        batchRename = new JButton("automatic rename");
+        batchRename.setFont(new Font("Arial", Font.PLAIN, 15));
+        batchRename.setSize(200, 30);
+        batchRename.setLocation(260, 100);
+        batchRename.addActionListener(this);
+        add(batchRename);
 
+        
         setLayout(null);
         getContentPane();
         setVisible(true);
