@@ -19,10 +19,12 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -33,6 +35,62 @@ public class Controller {
 
     MenuGui m;
     InfoGui i;
+
+    public class BobWorker {
+        File[] filelist;
+        int count;
+        public BobWorker(File files[]){
+            filelist = files;
+            count = 0;
+            sw1.execute();
+        }
+        
+        SwingWorker sw1 = new SwingWorker() {
+
+            @Override
+            protected String doInBackground() throws Exception {
+                // define what thread will do here
+
+                //handleProccessing(filelist);
+                for(int i=0;i<=10;i++){
+                    count++;
+                    publish(count);
+                }
+                
+
+                String res = "Finished Execution";
+                return res;
+            }
+
+            @Override
+            protected void process(List chunks) {
+                // define what the event dispatch thread 
+                // will do with the intermediate results received
+                // while the thread is executing
+                int val = (int) chunks.get(chunks.size() - 1);
+
+                System.out.println("Pog: "+String.valueOf(val));
+            }
+
+            @Override
+            protected void done() {
+                // this method is called when the background 
+                // thread finishes execution
+                try {
+                    String statusMsg = (String) get();
+                    System.out.println("Inside done function");
+                    System.out.println(statusMsg);
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        
+        
+    }
 
     static class PdfFileFilter implements FilenameFilter {
 
@@ -154,7 +212,7 @@ public class Controller {
         StringBuffer output = new StringBuffer();
         try {
             Manager.proccessing(files);
-            output.append(Manager.printResults());
+           // output.append(Manager.printResults());
 //            output.append(Manager.printName());
         } catch (Exception ex) {
             System.out.println("File not found");
@@ -216,12 +274,24 @@ public class Controller {
                     //This is where application begins proccesing the files.
                     if (files.length == 1) {
                         File directory = files[0];
-                        files = directory.listFiles(new PdfFileFilter());
-                        if (files.length == 0) {
-                            JOptionPane.showMessageDialog(null, "folder has no pdf files");
+                        if (files[0].isDirectory()) {
+                            files = directory.listFiles(new PdfFileFilter());
+                            if (files.length == 0) {
+                                JOptionPane.showMessageDialog(null, "folder has no pdf files");
+                            }
                         }
                     }
-                    handleProccessing(files);
+
+                    swingWorkerSample s = new swingWorkerSample(files);
+                    while(!s.sw1.isDone()){
+                        //wait until proccessing is done
+                    }
+//                    BobWorker b = new BobWorker(files);
+//                    while(!b.sw1.isDone()){
+//                        
+//                    }
+                    
+                    //handleProccessing(files);
                     Manager.makeBackup();
                     displayInfoGui(Manager.getResults());
                     setVisible(false);

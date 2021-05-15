@@ -58,9 +58,9 @@ public class DateRecogniser {
             output.add(matcher4.group(0));
             found = true;
         }
-        if (!found) {
-            System.out.println("No date found.");
-        }
+//        if (!found) {
+//            System.out.println("No date found.");
+//        }
         
         //returns the first matches of each type.
         return output;

@@ -68,7 +68,7 @@ public class DocumentEditor {
         this.modifiedDate = docInformation.getModificationDate();
         this.keywords = docInformation.getKeywords();
 
-        System.out.println(">>>Read file " + this.path + "<<<");
+      //  System.out.println(">>>Read file " + this.path + "<<<");
     }
 
   

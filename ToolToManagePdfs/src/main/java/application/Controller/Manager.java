@@ -10,13 +10,9 @@ import application.Model.DocumentEditor;
 import application.Model.NameRecogniser;
 import application.Model.Result;
 import application.Model.TitleRecogniser;
-import edu.stanford.nlp.ie.AbstractSequenceClassifier;
-import edu.stanford.nlp.ling.CoreLabel;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,14 +23,15 @@ import java.util.logging.Logger;
  */
 public class Manager {
 
-    String serializedClassifier;
-    AbstractSequenceClassifier<CoreLabel> classifier;
+    private static float progress = 0;
     static List<DocumentEditor> editors = new ArrayList<DocumentEditor>();
     static NameRecogniser nameRecogniser;
     static TitleRecogniser titleRecongniser;
     static DateRecogniser dateRecogniser;
     private static List<Result> results = new ArrayList<Result>();
     static List<Result> resultsBackUp;
+    
+    
        
 
     static void LoadManager() throws Exception {
@@ -47,15 +44,16 @@ public class Manager {
     static int proccessing(File[] files) throws Exception {
 //        File f = new File(files[0].getPath() + "scandText.txt");
 //        FileWriter fw = new FileWriter(f);
+        progress = 0;
 
         for (File file : files) {
 
-            System.out.println(">>>Making editor for file:" + file.getName() + "<<<");
+            //System.out.println(">>>Making editor for file:" + file.getName() + "<<<");
             DocumentEditor docEditor = new DocumentEditor(file);
 //            fw.append(docEditor.getScannedText());
 //            fw.append("\n" + "--------------------------------------------------------------------" + " \n");
-            editors.add(docEditor);
-
+            editors.add(docEditor);  
+            
             //save the file's properties
             String author = docEditor.getAuthor();
             //check if title property of file exists and if not extract it from content
@@ -69,14 +67,16 @@ public class Manager {
             date = date.replaceAll("\\]", "");
             if (date.equals("")) {//if date is an empty converted array to string
                 date = docEditor.getCreationDate().getTime().toString();//get creattion
-                System.out.println("Creation Date:" + date);
+                //System.out.println("Creation Date:" + date);
             }  
             String proposedName = date +" "+ title;
             
             generateResults(docEditor.getScannedText(), docEditor.getFileName(), 
                     title, date, author, proposedName);
+            
+            upProgress(files.length);
+            //System.out.print("Progress: " +(int)getProgress()+"%"+"\r");
         }
-
 //        fw.close();
         return 0;
     }
@@ -136,6 +136,15 @@ public class Manager {
         return results;
     }
 
+    static void upProgress(float maxProgress){
+        progress += 100/maxProgress;
+        
+    }
+    
+    static float getProgress(){
+        return progress;
+    }
+    
     static int closeAll() {
         editors.forEach(editor -> {
             try {
