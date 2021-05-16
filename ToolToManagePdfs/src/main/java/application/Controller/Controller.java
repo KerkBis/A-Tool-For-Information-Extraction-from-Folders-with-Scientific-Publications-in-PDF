@@ -14,18 +14,20 @@ import application.View.ShowInfo;
 import edu.stanford.nlp.io.ExtensionFileFilter;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileFilter;
+import java.util.concurrent.ExecutionException;
+import javax.swing.SwingWorker;
 
 /**
  *
@@ -35,62 +37,6 @@ public class Controller {
 
     MenuGui m;
     InfoGui i;
-
-    public class BobWorker {
-        File[] filelist;
-        int count;
-        public BobWorker(File files[]){
-            filelist = files;
-            count = 0;
-            sw1.execute();
-        }
-        
-        SwingWorker sw1 = new SwingWorker() {
-
-            @Override
-            protected String doInBackground() throws Exception {
-                // define what thread will do here
-
-                //handleProccessing(filelist);
-                for(int i=0;i<=10;i++){
-                    count++;
-                    publish(count);
-                }
-                
-
-                String res = "Finished Execution";
-                return res;
-            }
-
-            @Override
-            protected void process(List chunks) {
-                // define what the event dispatch thread 
-                // will do with the intermediate results received
-                // while the thread is executing
-                int val = (int) chunks.get(chunks.size() - 1);
-
-                System.out.println("Pog: "+String.valueOf(val));
-            }
-
-            @Override
-            protected void done() {
-                // this method is called when the background 
-                // thread finishes execution
-                try {
-                    String statusMsg = (String) get();
-                    System.out.println("Inside done function");
-                    System.out.println(statusMsg);
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-        
-        
-    }
 
     static class PdfFileFilter implements FilenameFilter {
 
@@ -212,7 +158,7 @@ public class Controller {
         StringBuffer output = new StringBuffer();
         try {
             Manager.proccessing(files);
-           // output.append(Manager.printResults());
+            // output.append(Manager.printResults());
 //            output.append(Manager.printName());
         } catch (Exception ex) {
             System.out.println("File not found");
@@ -261,6 +207,20 @@ public class Controller {
 
     }
 
+    public void executePro(File[] files) {
+        SwingWorkerSample task = new SwingWorkerSample(files);
+        task.execute();
+
+        task.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            if (evt.getPropertyName().equals("state") && evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                System.out.println("Task finished");
+                Manager.makeBackup();
+                displayInfoGui(Manager.getResults());
+            }
+        });
+
+    }
+
     public class MenuGui extends Menu {
 
         @Override
@@ -272,29 +232,15 @@ public class Controller {
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File[] files = fc.getSelectedFiles();
                     //This is where application begins proccesing the files.
-                    if (files.length == 1) {
-                        File directory = files[0];
-                        if (files[0].isDirectory()) {
-                            files = directory.listFiles(new PdfFileFilter());
-                            if (files.length == 0) {
-                                JOptionPane.showMessageDialog(null, "folder has no pdf files");
-                            }
+                    if (files.length == 1 && files[0].isDirectory()) {
+                        files = files[0].listFiles(new PdfFileFilter());
+                        if (files.length == 0) {
+                            JOptionPane.showMessageDialog(null, "folder has no pdf files");
                         }
                     }
-
-                    swingWorkerSample s = new swingWorkerSample(files);
-                    while(!s.sw1.isDone()){
-                        //wait until proccessing is done
-                    }
-//                    BobWorker b = new BobWorker(files);
-//                    while(!b.sw1.isDone()){
-//                        
-//                    }
-                    
-                    //handleProccessing(files);
-                    Manager.makeBackup();
-                    displayInfoGui(Manager.getResults());
                     setVisible(false);
+                    executePro(files);
+                    //handleProccessing(files);
                     dispose();
                 }
             } else if (e.getSource() == batchRename) {
