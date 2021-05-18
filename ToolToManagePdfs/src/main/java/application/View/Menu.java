@@ -56,6 +56,7 @@ public abstract class Menu extends JFrame
 
         setTitle("PDF Name Finder");
         setBounds(300, 90, 900, 600);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
         setBackground(Color.gray);

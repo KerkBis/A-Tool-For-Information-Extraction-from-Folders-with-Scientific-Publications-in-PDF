@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingWorker;
 
 /**
  *
@@ -23,16 +24,57 @@ import java.util.logging.Logger;
  */
 public class Manager {
 
-    private static float progress = 0;
     static List<DocumentEditor> editors = new ArrayList<DocumentEditor>();
     static NameRecogniser nameRecogniser;
     static TitleRecogniser titleRecongniser;
     static DateRecogniser dateRecogniser;
     private static List<Result> results = new ArrayList<Result>();
     static List<Result> resultsBackUp;
-    
-    
-       
+    static File[] fileList;
+
+    static SwingWorker processing = new SwingWorker() {
+        @Override
+        public String doInBackground() throws Exception {
+            // define what thread will do here
+            int progress = 0;
+            for (File file : fileList) {
+                DocumentEditor docEditor = new DocumentEditor(file);
+                editors.add(docEditor);
+                //save the file's properties
+                String author = docEditor.getAuthor();
+                //check if title property of file exists and if not extract it from content
+                String title = docEditor.getTitle();
+                if (title == null) {
+                    title = TitleRecogniser.findTitle(file);
+                }
+                //look for date in txt
+                dateRecogniser.setText(docEditor.getScannedText());
+                String date = dateRecogniser.findDate().toString();//array to string will return [date1,date2,date3]
+                date = date.replaceAll("\\[", "");
+                date = date.replaceAll("\\]", "");
+                if (date.equals("")) {//if date is an empty converted array to string
+                    date = docEditor.getCreationDate().getTime().toString();//get creattion
+                    //System.out.println("Creation Date:" + date);
+                }
+                
+                String proposedName = date + " " + title;
+
+                generateResults(docEditor.getScannedText(), docEditor.getFileName(),
+                        title, date, author, proposedName);
+                
+                Thread.sleep(100);
+                progress++;
+                setProgress(100 * progress / fileList.length);
+            }
+
+            String res = "Finished Execution";
+            return res;
+        }
+    };
+
+    static void setFiles(File[] files) {
+        fileList = files;
+    }
 
     static void LoadManager() throws Exception {
         //initialise NER and TER(Title Entities Recogniser)
@@ -44,7 +86,6 @@ public class Manager {
     static int proccessing(File[] files) throws Exception {
 //        File f = new File(files[0].getPath() + "scandText.txt");
 //        FileWriter fw = new FileWriter(f);
-        progress = 0;
 
         for (File file : files) {
 
@@ -52,8 +93,8 @@ public class Manager {
             DocumentEditor docEditor = new DocumentEditor(file);
 //            fw.append(docEditor.getScannedText());
 //            fw.append("\n" + "--------------------------------------------------------------------" + " \n");
-            editors.add(docEditor);  
-            
+            editors.add(docEditor);
+
             //save the file's properties
             String author = docEditor.getAuthor();
             //check if title property of file exists and if not extract it from content
@@ -61,27 +102,27 @@ public class Manager {
             if (title == null) {
                 title = TitleRecogniser.findTitle(file);
             }
-            dateRecogniser.setText(docEditor.getScannedText()); 
+            //look for date in txt
+            dateRecogniser.setText(docEditor.getScannedText());
             String date = dateRecogniser.findDate().toString();//array to string will return [date1,date2,date3]
             date = date.replaceAll("\\[", "");
             date = date.replaceAll("\\]", "");
             if (date.equals("")) {//if date is an empty converted array to string
                 date = docEditor.getCreationDate().getTime().toString();//get creattion
                 //System.out.println("Creation Date:" + date);
-            }  
-            String proposedName = date +" "+ title;
-            
-            generateResults(docEditor.getScannedText(), docEditor.getFileName(), 
+            }
+            String proposedName = date + " " + title;
+
+            generateResults(docEditor.getScannedText(), docEditor.getFileName(),
                     title, date, author, proposedName);
-            
-            upProgress(files.length);
+
             //System.out.print("Progress: " +(int)getProgress()+"%"+"\r");
         }
 //        fw.close();
         return 0;
     }
 
-    public static void generateResults(String scannedText, String fileName, 
+    public static void generateResults(String scannedText, String fileName,
             String title, String publicationDate, String author, String proposedName) throws Exception {
         //Analyse text with NER 
         nameRecogniser.setText(scannedText);
@@ -136,15 +177,6 @@ public class Manager {
         return results;
     }
 
-    static void upProgress(float maxProgress){
-        progress += 100/maxProgress;
-        
-    }
-    
-    static float getProgress(){
-        return progress;
-    }
-    
     static int closeAll() {
         editors.forEach(editor -> {
             try {

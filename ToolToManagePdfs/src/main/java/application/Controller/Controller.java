@@ -15,7 +15,6 @@ import edu.stanford.nlp.io.ExtensionFileFilter;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
@@ -26,7 +25,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
-import java.util.concurrent.ExecutionException;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 /**
@@ -208,16 +209,15 @@ public class Controller {
     }
 
     public void executePro(File[] files) {
-        SwingWorkerSample task = new SwingWorkerSample(files);
-        task.execute();
-
-        task.addPropertyChangeListener((PropertyChangeEvent evt) -> {
-            if (evt.getPropertyName().equals("state") && evt.getNewValue() == SwingWorker.StateValue.DONE) {
-                System.out.println("Task finished");
-                Manager.makeBackup();
-                displayInfoGui(Manager.getResults());
-            }
-        });
+//        BackgroundProcessing task = new BackgroundProcessing(files);
+//        task.execute();
+//        task.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+//            if (evt.getPropertyName().equals("state") && evt.getNewValue() == SwingWorker.StateValue.DONE) {
+//                System.out.println("Task finished");
+//                Manager.makeBackup();
+//                displayInfoGui(Manager.getResults());
+//            }
+//        });
 
     }
 
@@ -239,8 +239,31 @@ public class Controller {
                         }
                     }
                     setVisible(false);
-                    executePro(files);
-                    //handleProccessing(files);
+                    JFrame loadingFrame = new JFrame("Loading");
+                    loadingFrame.setBounds(300, 90, 500, 100);
+                    loadingFrame.setLocationRelativeTo(null);
+                    JProgressBar progressBar = new JProgressBar(0, 100);
+                    progressBar.setStringPainted(true);
+                    loadingFrame.add(progressBar);
+                    loadingFrame.setVisible(true);
+
+                    Manager.setFiles(files);
+                    Manager.processing.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                        if (evt.getPropertyName().equals("progress")) {
+                            progressBar.setValue((int)evt.getNewValue());
+                        }
+                    });
+                    Manager.processing.execute();
+                    Manager.processing.addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                        if (evt.getPropertyName().equals("state") && evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                            System.out.println("Task finished");
+                            Manager.makeBackup();
+                            displayInfoGui(Manager.getResults());
+                            loadingFrame.setVisible(false);
+                            loadingFrame.dispose();
+                        }
+                    });
+
                     dispose();
                 }
             } else if (e.getSource() == batchRename) {
