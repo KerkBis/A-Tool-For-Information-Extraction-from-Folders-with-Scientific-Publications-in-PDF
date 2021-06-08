@@ -26,11 +26,11 @@ public class App {
         Manager.LoadManager();
         Controller g = new Controller();
 //-----------------------gui mode------------------------------
-        g.displayMenuGui();
+        //g.displayMenuGui();
 
 //-----------------------command line mode---------------------
-//        Scanner keyboard = new Scanner(System.in);
-//        g.commandHandler(keyboard);
+        Scanner keyboard = new Scanner(System.in);
+        g.commandHandler(keyboard);
     }
 
 }

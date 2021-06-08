@@ -10,6 +10,8 @@ import application.Model.DocumentEditor;
 import application.Model.NameRecogniser;
 import application.Model.Result;
 import application.Model.TitleRecogniser;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,11 +34,26 @@ public class Manager {
     static List<Result> resultsBackUp;
     static File[] fileList;
 
+    static void LoadManager() throws Exception {
+        //initialise NER and TER(Title Entities Recogniser)
+        System.out.println("Chopping wood carying water");
+        nameRecogniser = new NameRecogniser();
+        dateRecogniser = new DateRecogniser();
+        System.out.println("Program is ready");
+
+    }
+
+    static void setFiles(File[] files) {
+        fileList = files;
+    }
+
     static SwingWorker processing = new SwingWorker() {
         @Override
         public String doInBackground() throws Exception {
-            // define what thread will do here
+
             int progress = 0;
+            setProgress(progress);
+
             for (File file : fileList) {
                 DocumentEditor docEditor = new DocumentEditor(file);
                 editors.add(docEditor);
@@ -56,31 +73,80 @@ public class Manager {
                     date = docEditor.getCreationDate().getTime().toString();//get creattion
                     //System.out.println("Creation Date:" + date);
                 }
-                
+
                 String proposedName = date + " " + title;
 
                 generateResults(docEditor.getScannedText(), docEditor.getFileName(),
                         title, date, author, proposedName);
-                
+
                 Thread.sleep(100);
                 progress++;
                 setProgress(100 * progress / fileList.length);
+                publish(100 * progress / fileList.length);
             }
 
-            String res = "Finished Execution";
-            return res;
+            return "Done";
+
+        }
+
+        @Override
+        protected void process(List chunks) {
+            System.out.println("Processing: " + chunks.get(chunks.size() - 1) + "%");
+        }
+
+        @Override
+        public void done() {
+            System.out.println("Proccessing Complete");
         }
     };
 
-    static void setFiles(File[] files) {
-        fileList = files;
-    }
+    static class BackgroundProcessing extends Thread {
 
-    static void LoadManager() throws Exception {
-        //initialise NER and TER(Title Entities Recogniser)
-        System.out.println("Loading please wait");
-        nameRecogniser = new NameRecogniser();
-        dateRecogniser = new DateRecogniser();
+        private int workCounter = 0;
+        private int progress = 0;
+
+        public int getProgress() {
+           
+            return progress;
+        }
+
+        @Override
+        public void run() {
+            workCounter = 0; 
+            for (File file : fileList) {
+                try {
+                    DocumentEditor docEditor = new DocumentEditor(file);
+                    editors.add(docEditor);
+                    //save the file's properties
+                    String author = docEditor.getAuthor();
+                    //check if title property of file exists and if not extract it from content
+                    String title = docEditor.getTitle();
+                    if (title == null) {
+                        title = TitleRecogniser.findTitle(file);
+                    }
+                    //look for date in txt
+                    dateRecogniser.setText(docEditor.getScannedText());
+                    String date = dateRecogniser.findDate().toString();//array to string will return [date1,date2,date3]
+                    date = date.replaceAll("\\[", "");
+                    date = date.replaceAll("\\]", "");
+                    if (date.equals("")) {//if date is an empty converted array to string
+                        date = docEditor.getCreationDate().getTime().toString();//get creattion
+                        //System.out.println("Creation Date:" + date);
+                    }
+
+                    String proposedName = date + " " + title;
+
+                    generateResults(docEditor.getScannedText(), docEditor.getFileName(),
+                            title, date, author, proposedName);
+
+                    Thread.sleep(100);
+                    workCounter++;
+                    progress = 100 * workCounter / fileList.length;
+                } catch (Exception ex) {
+                    Logger.getLogger(Manager.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
     }
 
     static int proccessing(File[] files) throws Exception {

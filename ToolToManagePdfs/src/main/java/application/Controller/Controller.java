@@ -15,11 +15,14 @@ import edu.stanford.nlp.io.ExtensionFileFilter;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -105,7 +108,13 @@ public class Controller {
                     System.out.println("unrecognised command");
                 }
             }
-            if (executeCommand(extraction, inputedFile, outputedFile, batchRename,
+//            ExecThread ect = new ExecThread(extraction, inputedFile, outputedFile,
+//                    batchRename, unrecognisedCmd, inFolder, outFile);
+//            ect.start();
+//            while (ect.isAlive()) {
+//
+//            }
+            if (executeCommands(extraction, inputedFile, outputedFile, batchRename,
                     unrecognisedCmd, inFolder, outFile) == 0) {
                 System.out.println("System Error execution of command failed...exiting");
                 return 0;
@@ -115,7 +124,7 @@ public class Controller {
         return 1;
     }
 
-    static int executeCommand(boolean extraction, boolean inputedFile, boolean outputedFile,
+    static int executeCommands(boolean extraction, boolean inputedFile, boolean outputedFile,
             boolean batchRename, boolean unrecognisedCmd,
             File inFolder, File outFile) {
 
@@ -126,6 +135,7 @@ public class Controller {
                 if (fileList.length == 0) {
                     System.out.println("folder has no pdf files");
                     return 1;
+//                        state = 1;
                 }
                 handleProccessing(fileList);
 
@@ -134,7 +144,7 @@ public class Controller {
                 System.out.println("File not found");
             }
             return 1;
-
+//                state = 1;
         } else if (batchRename && inputedFile && outputedFile) {
             try {
                 if (outFile.isDirectory()) {
@@ -143,37 +153,76 @@ public class Controller {
                     System.out.println("Folder is not a directory");
                 }
                 return 1;
+//                    state = 1;
             } catch (NullPointerException ne) {
                 System.out.println("File not found");
             }
 
         } else if (unrecognisedCmd) {
             return 1;
+//                state = 1;
         }
-
         return 0;
+//            state = 0;
     }
 
     static int handleProccessing(File[] files) {
 
         StringBuffer output = new StringBuffer();
+        int done = 0;
         try {
-            Manager.proccessing(files);
-            // output.append(Manager.printResults());
-//            output.append(Manager.printName());
+            Manager.closeAll();
+            Manager.setFiles(files);
+//-------Using Swing Worker-----------------------------------------------------------------
+
+            PropertyChangeListener progress = new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if (evt.getPropertyName().equals("progress")) {
+                        System.out.print("Proccessing: " + (int) evt.getNewValue() + "%\r");
+                    }
+                    if (evt.getPropertyName().equals("state") && evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                        System.out.println("\n Complete");
+
+                    }
+                }
+            };
+            //Manager.processing.addPropertyChangeListener(progress);
+//            Manager.processing.execute();
+//            Manager.processing.get();//wait for processing to finish
+            // Manager.processing.removePropertyChangeListener(progress);
+//-------Using Thread-----------------------------------------------------------------
+            Manager.BackgroundProcessing bg = new Manager.BackgroundProcessing();
+            bg.start();
+            
+            int curProgress =  bg.getProgress();
+            int newProgress = curProgress;
+             System.out.print("Proccessing: " + curProgress + "%\r");
+            while (bg.isAlive()) {
+                if (curProgress != newProgress) {
+                    curProgress = newProgress;
+                    System.out.print("Proccessing: " + curProgress + "%\r");
+                }
+                newProgress = bg.getProgress();
+            }
+
         } catch (Exception ex) {
             System.out.println("File not found");
         }
-        System.out.println("pdfExtracted!!!");
         return 1;
     }
 
     static int handleBatchRename(File inFile, File outFile) {
 
-        List<String> changedFileNames;
-        try {
+        List<String> changedFileNames = null;
+      
             Manager.closeAll();
+        try {
             changedFileNames = CSVeditor.readFirstElemFromCSV(inFile);
+        } catch (Exception ex) {
+            System.out.println("Read csv file failed, invalid csv file or target folder ");
+            return 0;
+        }
 
             File fileList[] = outFile.listFiles(new PdfFileFilter());
 
@@ -200,9 +249,7 @@ public class Controller {
                 }
                 index++;
             }
-        } catch (Exception ex) {
-            System.out.println("Read csv file failed, invalid csv file or target folder ");
-        }
+        
 
         return 1;
 
@@ -250,7 +297,7 @@ public class Controller {
                     Manager.setFiles(files);
                     Manager.processing.addPropertyChangeListener((PropertyChangeEvent evt) -> {
                         if (evt.getPropertyName().equals("progress")) {
-                            progressBar.setValue((int)evt.getNewValue());
+                            progressBar.setValue((int) evt.getNewValue());
                         }
                     });
                     Manager.processing.execute();
@@ -336,7 +383,7 @@ public class Controller {
                 int returnVal = fc.showSaveDialog(InfoGui.this);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
-                    CSVeditor.exportToCSV(Manager.getResults(), file);
+                    CSVeditor.exportToCSVv2(Manager.getResults(), file);
                 }
                 Manager.closeAll();
                 displayMenuGui();

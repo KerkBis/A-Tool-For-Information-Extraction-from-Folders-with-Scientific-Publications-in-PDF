@@ -32,31 +32,11 @@ public class NameRecogniser {
         this.text = text;
     }
     
-  public class ConsoleProgressBar extends Thread {
-    public void run() {
-        char[] animationChars = new char[]{'|', '/', '-', '\\'};
-        System.out.print("[=");
-        for (int i = 0; i <= 100; i++) {
-           // System.out.print("Processing: " + i + "% " + animationChars[i % 4] + "\rXXX");
-           System.out.print("=");
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.print("=]");
-        System.out.println("Processing: Done!          ");
-    }
-}
     
     public NameRecogniser() throws Exception {
         serializedClassifier = "classifiers/english.all.3class.distsim.crf.ser.gz";
-        ConsoleProgressBar crp = new ConsoleProgressBar();
-        crp.start();
-
         classifier = CRFClassifier.getClassifier(serializedClassifier);
-
+        
         while (classifier == null) {
             System.out.print("+++");
         }
