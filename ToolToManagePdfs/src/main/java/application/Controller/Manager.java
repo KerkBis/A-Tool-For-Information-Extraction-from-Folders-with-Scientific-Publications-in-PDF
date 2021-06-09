@@ -33,6 +33,7 @@ public class Manager {
     private static List<Result> results = new ArrayList<Result>();
     static List<Result> resultsBackUp;
     static File[] fileList;
+    static SwingWorker fileProcessTask; 
 
     static void LoadManager() throws Exception {
         //initialise NER and TER(Title Entities Recogniser)
@@ -100,19 +101,18 @@ public class Manager {
         }
     };
 
-    static class BackgroundProcessing extends Thread {
+    static class BackgroundFileProcess extends Thread {
 
         private int workCounter = 0;
         private int progress = 0;
 
         public int getProgress() {
-           
             return progress;
         }
 
         @Override
         public void run() {
-            workCounter = 0; 
+            workCounter = 0;
             for (File file : fileList) {
                 try {
                     DocumentEditor docEditor = new DocumentEditor(file);
@@ -149,42 +149,75 @@ public class Manager {
         }
     }
 
-    static int proccessing(File[] files) throws Exception {
-//        File f = new File(files[0].getPath() + "scandText.txt");
-//        FileWriter fw = new FileWriter(f);
-
-        for (File file : files) {
-
-            //System.out.println(">>>Making editor for file:" + file.getName() + "<<<");
-            DocumentEditor docEditor = new DocumentEditor(file);
-//            fw.append(docEditor.getScannedText());
-//            fw.append("\n" + "--------------------------------------------------------------------" + " \n");
-            editors.add(docEditor);
-
-            //save the file's properties
-            String author = docEditor.getAuthor();
-            //check if title property of file exists and if not extract it from content
-            String title = docEditor.getTitle();
-            if (title == null) {
-                title = TitleRecogniser.findTitle(file);
+    static SwingWorker startBackgroundProcessing(PropertyChangeListener listener) {
+        fileProcessTask = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                BackgroundFileProcess bg = new BackgroundFileProcess();
+                bg.start();
+                while (bg.isAlive()) {
+                    setProgress(bg.getProgress());
+                }
+                bg.join();
+                return bg;
             }
-            //look for date in txt
-            dateRecogniser.setText(docEditor.getScannedText());
-            String date = dateRecogniser.findDate().toString();//array to string will return [date1,date2,date3]
-            date = date.replaceAll("\\[", "");
-            date = date.replaceAll("\\]", "");
-            if (date.equals("")) {//if date is an empty converted array to string
-                date = docEditor.getCreationDate().getTime().toString();//get creattion
-                //System.out.println("Creation Date:" + date);
+            @Override
+            protected void done() {
+                try {
+                    super.get();
+                    System.out.println("Task complete");
+                    //can call other gui update code here
+                } catch (Throwable t) {
+                    //do something with the exception
+                    System.out.println("Background proccess failed");
+                }
             }
-            String proposedName = date + " " + title;
+        };
+        fileProcessTask.addPropertyChangeListener(listener);
+        return fileProcessTask;
+    }
 
-            generateResults(docEditor.getScannedText(), docEditor.getFileName(),
-                    title, date, author, proposedName);
+    public static SwingWorker getFileProcessTask() {
+        return fileProcessTask;
+    }
+ 
+    static int processing() throws Exception {
+        int workCounter = 0;
+        int progress = 0;
 
-            //System.out.print("Progress: " +(int)getProgress()+"%"+"\r");
+        for (File file : fileList) {
+            try {
+                DocumentEditor docEditor = new DocumentEditor(file);
+                editors.add(docEditor);
+                //save the file's properties
+                String author = docEditor.getAuthor();
+                //check if title property of file exists and if not extract it from content
+                String title = docEditor.getTitle();
+                if (title == null) {
+                    title = TitleRecogniser.findTitle(file);
+                }
+                //look for date in txt
+                dateRecogniser.setText(docEditor.getScannedText());
+                String date = dateRecogniser.findDate().toString();//array to string will return [date1,date2,date3]
+                date = date.replaceAll("\\[", "");
+                date = date.replaceAll("\\]", "");
+                if (date.equals("")) {//if date is an empty converted array to string
+                    date = docEditor.getCreationDate().getTime().toString();//get creattion
+                    //System.out.println("Creation Date:" + date);
+                }
+
+                String proposedName = date + " " + title;
+
+                generateResults(docEditor.getScannedText(), docEditor.getFileName(),
+                        title, date, author, proposedName);
+
+                Thread.sleep(100);
+                workCounter++;
+                progress = 100 * workCounter / fileList.length;
+            } catch (Exception ex) {
+                Logger.getLogger(Manager.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-//        fw.close();
         return 0;
     }
 
@@ -254,6 +287,7 @@ public class Manager {
         });
         editors.clear();
         results.clear();
+        fileList = null;
 
         return 0;
     }

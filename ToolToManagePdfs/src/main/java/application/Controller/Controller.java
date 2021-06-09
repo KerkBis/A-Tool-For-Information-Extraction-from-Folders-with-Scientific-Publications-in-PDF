@@ -150,7 +150,7 @@ public class Controller {
                 if (outFile.isDirectory()) {
                     handleBatchRename(inFolder, outFile);
                 } else {
-                    System.out.println("Folder is not a directory");
+                    System.out.println("No directory or does not exist");
                 }
                 return 1;
 //                    state = 1;
@@ -181,30 +181,30 @@ public class Controller {
                     if (evt.getPropertyName().equals("progress")) {
                         System.out.print("Proccessing: " + (int) evt.getNewValue() + "%\r");
                     }
-                    if (evt.getPropertyName().equals("state") && evt.getNewValue() == SwingWorker.StateValue.DONE) {
-                        System.out.println("\n Complete");
-
-                    }
                 }
             };
+            Manager.startBackgroundProcessing(progress).execute();
+            Manager.getFileProcessTask().get();
             //Manager.processing.addPropertyChangeListener(progress);
 //            Manager.processing.execute();
 //            Manager.processing.get();//wait for processing to finish
             // Manager.processing.removePropertyChangeListener(progress);
 //-------Using Thread-----------------------------------------------------------------
-            Manager.BackgroundProcessing bg = new Manager.BackgroundProcessing();
-            bg.start();
-            
-            int curProgress =  bg.getProgress();
-            int newProgress = curProgress;
-             System.out.print("Proccessing: " + curProgress + "%\r");
-            while (bg.isAlive()) {
-                if (curProgress != newProgress) {
-                    curProgress = newProgress;
-                    System.out.print("Proccessing: " + curProgress + "%\r");
-                }
-                newProgress = bg.getProgress();
-            }
+//            Manager.BackgroundFileProcess bg = new Manager.BackgroundFileProcess();
+//            bg.start();
+//            int curProgress = bg.getProgress();
+//            int newProgress = curProgress;
+//            System.out.print("Proccessing: " + curProgress + "%\r");
+//            while (bg.isAlive()) {
+//                if (curProgress != newProgress) {
+//                    curProgress = newProgress;
+//                    System.out.print("Proccessing: " + curProgress + "%\r");
+//                }
+//                newProgress = bg.getProgress();
+//            }
+//--------------------------------------------------------------------------------------
+
+            Manager.makeBackup();
 
         } catch (Exception ex) {
             System.out.println("File not found");
@@ -215,8 +215,8 @@ public class Controller {
     static int handleBatchRename(File inFile, File outFile) {
 
         List<String> changedFileNames = null;
-      
-            Manager.closeAll();
+
+        Manager.closeAll();
         try {
             changedFileNames = CSVeditor.readFirstElemFromCSV(inFile);
         } catch (Exception ex) {
@@ -224,32 +224,30 @@ public class Controller {
             return 0;
         }
 
-            File fileList[] = outFile.listFiles(new PdfFileFilter());
+        File fileList[] = outFile.listFiles(new PdfFileFilter());
 
-            if (fileList.length != changedFileNames.size()) {
-                System.out.println("BatchRename can not be applied to this folder");
-                return 1;
-            }
+        if (fileList.length != changedFileNames.size()) {
+            System.out.println("BatchRename can not be applied to this folder");
+            return 1;
+        }
 
-            int index = 0;
-            for (File file : fileList) {
-                String oldName = file.getName();
-                String newName = changedFileNames.get(index); // first entry of csv line containing the file name
-                String pathName = outFile + "\\" + newName;
+        int index = 0;
+        for (File file : fileList) {
+            String oldName = file.getName();
+            String newName = changedFileNames.get(index); // first entry of csv line containing the file name
+            String pathName = outFile + "\\" + newName;
 
-                File newFileName = new File(pathName);
+            File newFileName = new File(pathName);
 
-                if (!oldName.equals(newName)) {
-                    System.out.println("trying to rename: " + file.getName() + " to: " + newFileName.getName());
-                    if (file.renameTo(newFileName)) {
-                        System.out.println("Rename Success");
-                    } else {
-                        System.out.println("Renaming failed");
-                    }
+            if (!oldName.equals(newName)) {
+                if (file.renameTo(newFileName)) {
+                    System.out.println("Renamed " + file.getName() + " to: " + newFileName.getName());
+                } else {
+                    System.out.println("Renaming failed");
                 }
-                index++;
             }
-        
+            index++;
+        }
 
         return 1;
 
@@ -294,23 +292,43 @@ public class Controller {
                     loadingFrame.add(progressBar);
                     loadingFrame.setVisible(true);
 
-                    Manager.setFiles(files);
-                    Manager.processing.addPropertyChangeListener((PropertyChangeEvent evt) -> {
-                        if (evt.getPropertyName().equals("progress")) {
-                            progressBar.setValue((int) evt.getNewValue());
-                        }
-                    });
-                    Manager.processing.execute();
-                    Manager.processing.addPropertyChangeListener((PropertyChangeEvent evt) -> {
-                        if (evt.getPropertyName().equals("state") && evt.getNewValue() == SwingWorker.StateValue.DONE) {
-                            System.out.println("Task finished");
-                            Manager.makeBackup();
-                            displayInfoGui(Manager.getResults());
-                            loadingFrame.setVisible(false);
-                            loadingFrame.dispose();
-                        }
-                    });
+                    PropertyChangeListener listener = new PropertyChangeListener() {
+                        @Override
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            if (evt.getPropertyName().equals("progress")) {
+                                progressBar.setValue((int) evt.getNewValue());
+                            }
+                            if (evt.getPropertyName().equals("state") && evt.getNewValue() == SwingWorker.StateValue.DONE) {
 
+                                Manager.makeBackup();
+                                displayInfoGui(Manager.getResults());
+                                loadingFrame.setVisible(false);
+                                loadingFrame.dispose();
+                            }
+                        }
+                    };
+
+                    Manager.setFiles(files);
+                    Manager.startBackgroundProcessing(listener).execute();
+
+//With Thread-------------------------------------------------------------------------------------
+//                    int curProgress = bg.getProgress();
+//                    int newProgress = curProgress;
+//                    progressBar.setValue(curProgress);
+//                    while (bg.isAlive()) {
+//                        if (curProgress != newProgress) {
+//                            curProgress = newProgress;
+//                            progressBar.setValue(curProgress);
+//                        }
+//                        newProgress = bg.getProgress();
+//                    }
+//
+//                    System.out.println("Task finished");
+//                    Manager.makeBackup();
+//                    displayInfoGui(Manager.getResults());
+//                    loadingFrame.setVisible(false);
+//                    loadingFrame.dispose();
+//-------------------------------------------------------------------------------------------
                     dispose();
                 }
             } else if (e.getSource() == batchRename) {
