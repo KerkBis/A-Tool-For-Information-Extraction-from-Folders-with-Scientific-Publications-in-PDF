@@ -26,27 +26,25 @@ public class InfoPanel extends JPanel {
     JLabel fileLabel;
     JLabel nameLabel;
     ArrayList<JTextField> nameFields = new ArrayList<>();
-    ArrayList<Entry> entries = new ArrayList<>();
+    ArrayList<Entry> entries;
     JButton more;
 
     public class Entry {
 
         JTextField fileField;
-        ArrayList<JTextField> nameFields = new ArrayList<>();
+        JTextField titleField;
+        JTextField publicationTimeField;
+        JTextField proposedNameField;
+        //ArrayList<JTextField> nameFields = new ArrayList<>();
         InfoPopUpTable hiddenNamesTable = null;
 
-        public Entry(String fileName, List<String> names) {
+        public Entry(String fileName, String title, String publicationTime, List<String> names, String proposedName) {
             this.fileField = new JTextField(fileName);
+            this.titleField = new JTextField(title);
+            this.publicationTimeField = new JTextField(publicationTime);
+            this.proposedNameField = new JTextField(proposedName);
+            this.hiddenNamesTable = new InfoPopUpTable(names);
 
-            if (names.size() > 2) {
-                this.nameFields.add(new JTextField(names.get(0)));
-                this.nameFields.add(new JTextField(names.get(1)));
-                this.hiddenNamesTable = new InfoPopUpTable(names.subList(2, names.size()));
-            } else {
-                for (String name : names) {
-                    this.nameFields.add(new JTextField(name));
-                }
-            }
         }
 
         public boolean hiddenNamesExists() {
@@ -55,8 +53,16 @@ public class InfoPanel extends JPanel {
     }
 
     public void createEntries(List<Result> results) {
+        entries = new ArrayList<>();
         results.forEach(result -> {
-            entries.add(new Entry(result.getFileName(), result.getNames()));
+            entries.add(new Entry(result.getFileName(), result.getTitle(), result.getPublicationDate(),
+                    result.getNames(), result.getProposedName()));
+        });
+    }
+
+    public void disposeEntries() {
+        entries.forEach(entry -> {
+            entry.hiddenNamesTable.dispose();
         });
     }
 
@@ -73,89 +79,64 @@ public class InfoPanel extends JPanel {
 
         createEntries(results);
 
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        this.add(new Label("FILE"), gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        this.add(new Label("TITLE"), gbc);
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        this.add(new Label("PUBLICATION DATE"), gbc);
+        gbc.gridx = 3;
+        gbc.gridy = 0;
+        this.add(new Label("PROPOSED NAME"), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         entries.forEach(entry -> {
-            this.add(new Label("FILE"), gbc);
-            gbc.gridx++;
 
             this.add(entry.fileField, gbc);
             gbc.gridx++;
 
-            this.add(new Label("NAMES"), gbc);
+            this.add(entry.titleField, gbc);
             gbc.gridx++;
 
-            entry.nameFields.forEach((nameField) -> {
-                this.add(nameField, gbc);
-                gbc.gridx++;
-            });
+            this.add(entry.publicationTimeField, gbc);
+            gbc.gridx++;
+
+            this.add(entry.proposedNameField, gbc);
+            gbc.gridx++;
+
             if (entry.hiddenNamesExists()) {
-                JButton b = new JButton("more");
-                b.addActionListener((e) -> {
+                JButton button = new JButton("Names");
+                button.addActionListener((e) -> {
                     entry.hiddenNamesTable.getFrame().setVisible(true);
                 });
-                this.add(b, gbc);
+                this.add(button, gbc);
             }
             gbc.gridx = 0;
             gbc.gridy++;
         });
 
-//        for (Result result : results) {
-//            this.add(new Label("FILE"), gbc);
-//
-//            gbc.gridx++;
-//            JTextField tfile = new JTextField(result.getFileName());
-//            this.add(tfile, gbc);
-//            gbc.gridx++;
-//            this.add(new Label("NAMES"), gbc);
-//            gbc.gridx++;
-//            int counter = 1;
-//            for (String name : result.getNames()) {
-//
-//                JTextField tname = new JTextField(name);
-//                this.add(tname, gbc);
-//                nameFields.add(tname);
-//                gbc.gridx++;
-//
-//                if (counter > 2) {
-//                    InfoPopUpTable hiddenNameTable = new InfoPopUpTable(new ArrayList<String>(
-//                            result.getNames().subList(
-//                                    2, result.getNames().size()
-//                            )
-//                    )
-//                    );
-//                    JButton b = new JButton("more");
-//                    b.addActionListener((e) -> {
-//                        hiddenNameTable.getFrame().setVisible(true);
-//                    });
-//                    this.add(b, gbc);
-//                    entries.add(new Entry(tfile, nameFields, hiddenNameTable));
-//                    nameFields.clear();
-//                    break;
-//                }
-//                counter++;
-//            }
-//
-//            gbc.gridx = 0;
-//            gbc.gridy++;
-//        }
         setSize(800, 300);
-//        setPreferredSize(getSize());
         setVisible(true);
     }
 
     public List<Result> getFieldContent() {
         List<Result> results = new ArrayList<>();
+
         entries.forEach(entry -> {
             String fileName = entry.fileField.getText();
+            String title = entry.titleField.getText();
+            String publicationTime = entry.publicationTimeField.getText();
+            String proposedName = entry.proposedNameField.getText();
             ArrayList<String> names = new ArrayList<>();
-            entry.nameFields.forEach((nameField) -> {
-                if (!nameField.getText().equals(""))
-                names.add(nameField.getText());
-            });
             if (entry.hiddenNamesExists()) {
                 names.addAll(entry.hiddenNamesTable.getNames());
             }
+            results.add(new Result(fileName, title, publicationTime, names, proposedName));
 
-            results.add(new Result(fileName, names));
         });
 
         return results;

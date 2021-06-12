@@ -7,7 +7,6 @@ package application.Controller;
 
 import application.Model.CSVeditor;
 import application.Model.Result;
-import application.View.InfoElements;
 import application.View.InfoPanel;
 import application.View.Menu;
 import application.View.ShowInfo;
@@ -228,7 +227,7 @@ public class Controller {
 
         if (fileList.length != changedFileNames.size()) {
             System.out.println("BatchRename can not be applied to this folder");
-            return 1;
+            return 2;
         }
 
         int index = 0;
@@ -253,19 +252,6 @@ public class Controller {
 
     }
 
-    public void executePro(File[] files) {
-//        BackgroundProcessing task = new BackgroundProcessing(files);
-//        task.execute();
-//        task.addPropertyChangeListener((PropertyChangeEvent evt) -> {
-//            if (evt.getPropertyName().equals("state") && evt.getNewValue() == SwingWorker.StateValue.DONE) {
-//                System.out.println("Task finished");
-//                Manager.makeBackup();
-//                displayInfoGui(Manager.getResults());
-//            }
-//        });
-
-    }
-
     public class MenuGui extends Menu {
 
         @Override
@@ -273,7 +259,9 @@ public class Controller {
             // Handle open button action.
             int returnVal;
             if (e.getSource() == open) {
+                initFileChooserPdf();
                 returnVal = fc.showOpenDialog(MenuGui.this);
+
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File[] files = fc.getSelectedFiles();
                     //This is where application begins proccesing the files.
@@ -333,12 +321,7 @@ public class Controller {
                 }
             } else if (e.getSource() == batchRename) {
 
-                fc.setMultiSelectionEnabled(false);
-                fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                FileFilter csvType = new ExtensionFileFilter("csv", rootPaneCheckingEnabled);
-                fc.setFileFilter(csvType);
-                fc.setAcceptAllFileFilterUsed(false);
-
+                initFileChooserCsv();
                 returnVal = fc.showOpenDialog(MenuGui.this);
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File inFile = fc.getSelectedFile();
@@ -347,12 +330,15 @@ public class Controller {
                     returnVal = fc.showOpenDialog(MenuGui.this);
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
                         File outFile = fc.getSelectedFile();
-                        if (outFile.isDirectory()) {
-                            handleBatchRename(inFile, outFile);
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Folder is not a directory");
+                        switch (handleBatchRename(inFile, outFile)) {
+                            case 0:
+                                JOptionPane.showMessageDialog(null, "Read csv file failed, invalid csv file or target folder");
+                                break;
+                            case 2:
+                                JOptionPane.showMessageDialog(null, "BatchRename can not be applied to this folder");
                         }
                     }
+                    JOptionPane.showMessageDialog(null, "BatchRename successfull");
                 }
 
             }
@@ -361,19 +347,11 @@ public class Controller {
 
     public class InfoGui extends ShowInfo {
 
-        public List<InfoElements> ipanels = new ArrayList<>();
-        JButton batchRename;
         JScrollPane jScrollPane1;
         InfoPanel panel;
 
         public InfoGui(List<Result> results) {
 
-            batchRename = new JButton("automatic raname");
-            batchRename.setFont(new Font("Arial", Font.PLAIN, 15));
-            batchRename.setSize(40, 30);
-            batchRename.setLocation(50, 10);
-            batchRename.addActionListener(this);
-            this.add(batchRename);
 
             jScrollPane1 = new JScrollPane();
             jScrollPane1.setSize(800, 300);
@@ -394,7 +372,7 @@ public class Controller {
 
                 int i = 0;
                 for (Result result : panel.getFieldContent()) {
-                    Manager.modifyResults(result, i);
+                    Manager.modifyResults(i, result);
                     i++;
                 };
 
@@ -406,6 +384,7 @@ public class Controller {
                 Manager.closeAll();
                 displayMenuGui();
                 setVisible(false);
+                panel.disposeEntries();
                 dispose();
 
             } else if (e.getSource() == reset) {

@@ -37,14 +37,29 @@ public abstract class Menu extends JFrame
 
     // constructor, to initialize the components
     // with default values.
-    public void initFileChooser() {
+    public void initFileChooserPdf() {
         //Create file chooser
         fc = new JFileChooser();
         //dfferent modes
         fc.setMultiSelectionEnabled(true);
-        fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         FileFilter pdfType = new ExtensionFileFilter("pdf", rootPaneCheckingEnabled);
         fc.setFileFilter(pdfType);
+        fc.setAcceptAllFileFilterUsed(false);
+
+        //---> fc.addChoosableFileFilter(new FileNameExtensionFilter("*.pdf", "pdf"));
+        //fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        //fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+    }
+
+    public void initFileChooserCsv() {
+        //Create file chooser
+        fc = new JFileChooser();
+        //dfferent modes
+        fc.setMultiSelectionEnabled(false);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        FileFilter csvType = new ExtensionFileFilter("csv", rootPaneCheckingEnabled);
+        fc.setFileFilter(csvType);
         fc.setAcceptAllFileFilterUsed(false);
 
         //---> fc.addChoosableFileFilter(new FileNameExtensionFilter("*.pdf", "pdf"));
@@ -67,8 +82,6 @@ public abstract class Menu extends JFrame
         title.setLocation(50, 50);
         add(title);
 
-        initFileChooser();
-
         open = new JButton("Open a File...");
         open.setFont(new Font("Arial", Font.PLAIN, 15));
         open.setSize(200, 30);
@@ -83,7 +96,6 @@ public abstract class Menu extends JFrame
         batchRename.addActionListener(this);
         add(batchRename);
 
-        
         setLayout(null);
         getContentPane();
         setVisible(true);

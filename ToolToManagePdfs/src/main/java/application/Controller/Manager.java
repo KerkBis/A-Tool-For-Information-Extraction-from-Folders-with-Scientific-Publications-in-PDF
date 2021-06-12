@@ -165,7 +165,7 @@ public class Manager {
             protected void done() {
                 try {
                     super.get();
-                    System.out.println("Task complete");
+                    System.out.println("Processing complete ");
                     //can call other gui update code here
                 } catch (Throwable t) {
                     //do something with the exception
@@ -243,7 +243,7 @@ public class Manager {
         results = resultsBackUp;
     }
 
-    static void modifyResults(Result element, int elementIndex) {
+    static void modifyResults(int elementIndex, Result element) {
         results.set(elementIndex, element);
     }
 
@@ -272,8 +272,8 @@ public class Manager {
         return output;
     }
 
-    static List<Result> getResults() {
-        return results;
+    static ArrayList<Result> getResults() {
+        return new ArrayList<Result>(results);
     }
 
     static int closeAll() {
