@@ -184,10 +184,6 @@ public class Controller {
             };
             Manager.startBackgroundProcessing(progress).execute();
             Manager.getFileProcessTask().get();
-            //Manager.processing.addPropertyChangeListener(progress);
-//            Manager.processing.execute();
-//            Manager.processing.get();//wait for processing to finish
-            // Manager.processing.removePropertyChangeListener(progress);
 //-------Using Thread-----------------------------------------------------------------
 //            Manager.BackgroundFileProcess bg = new Manager.BackgroundFileProcess();
 //            bg.start();

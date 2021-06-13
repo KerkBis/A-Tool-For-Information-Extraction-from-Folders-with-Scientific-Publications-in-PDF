@@ -31,9 +31,9 @@ public class Manager {
     static TitleRecogniser titleRecongniser;
     static DateRecogniser dateRecogniser;
     private static List<Result> results = new ArrayList<Result>();
-    static List<Result> resultsBackUp;
+    static List<Result> resultsBackUp = null;
     static File[] fileList;
-    static SwingWorker fileProcessTask; 
+    static SwingWorker fileProcessTask;
 
     static void LoadManager() throws Exception {
         //initialise NER and TER(Title Entities Recogniser)
@@ -161,6 +161,7 @@ public class Manager {
                 bg.join();
                 return bg;
             }
+
             @Override
             protected void done() {
                 try {
@@ -180,7 +181,7 @@ public class Manager {
     public static SwingWorker getFileProcessTask() {
         return fileProcessTask;
     }
- 
+
     static int processing() throws Exception {
         int workCounter = 0;
         int progress = 0;
@@ -240,7 +241,12 @@ public class Manager {
     }
 
     static void resetResults() {
-        results = resultsBackUp;
+        if (resultsBackUp != null) {
+            results = resultsBackUp;
+        } else {
+            System.out.println("ResetResults failed: no back up exists");
+        }
+
     }
 
     static void modifyResults(int elementIndex, Result element) {
