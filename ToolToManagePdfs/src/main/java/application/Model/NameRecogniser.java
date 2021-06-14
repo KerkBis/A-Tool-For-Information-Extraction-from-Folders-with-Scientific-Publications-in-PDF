@@ -37,9 +37,6 @@ public class NameRecogniser {
         serializedClassifier = "classifiers/english.all.3class.distsim.crf.ser.gz";
         classifier = CRFClassifier.getClassifier(serializedClassifier);
         
-        while (classifier == null) {
-            System.out.print("+++");
-        }
     }
     
     public NameRecogniser(String inputText) throws Exception {
