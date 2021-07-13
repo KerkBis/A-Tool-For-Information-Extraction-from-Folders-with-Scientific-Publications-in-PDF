@@ -332,9 +332,12 @@ public class Controller {
                                 break;
                             case 2:
                                 JOptionPane.showMessageDialog(null, "BatchRename can not be applied to this folder");
+                                break;
+                            default:
+                                JOptionPane.showMessageDialog(null, "BatchRename successfull");
                         }
                     }
-                    JOptionPane.showMessageDialog(null, "BatchRename successfull");
+                    
                 }
 
             }

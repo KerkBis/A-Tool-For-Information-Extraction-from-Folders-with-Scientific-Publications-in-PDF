@@ -98,7 +98,7 @@ public class NameRecogniser {
         
         ArrayList<String> output = new ArrayList();
         String specialChars = "àáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð’,.'-";
-        var p = Pattern.compile(
+        Pattern p = Pattern.compile(
                 "(\\b[A-Z’]{1,}" //recognizes a word starting with at least one capital letter
                 + "[a-z" //followed by words from simple alphabet
                 + specialChars + "]+)" //and special characters from foreign languages
